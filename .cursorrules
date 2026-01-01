@@ -1,0 +1,23 @@
+# Project Compass .cursorrules
+
+// DeepSeek V3 Distill (Scaleway) Configuration
+// We are using a private DeepSeek-V3-Distill-Llama-70B model hosted on Scaleway.
+// This model is optimized for high-stakes reasoning and strategic positioning.
+// Always assume the API follows OpenAI-compatibility standards.
+// API_BASE: defined in .env as DEEPSEEK_API_BASE
+// API_KEY: defined in .env as DEEPSEEK_API_KEY
+
+// Coding Standards
+// Backend: FastAPI (Python 3.11+), Pydantic v2, SQLAlchemy/SQLModel (PostgreSQL).
+// Frontend: Next.js 15 (App Router), TypeScript, Tailwind CSS, Shadcn UI.
+// Orchestration: LangGraph (LangChain).
+// Thread-First Model: All communication data must be mapped to a `thread_id`.
+// Recursive Summarization: Update JSON summaries instead of raw appending.
+// Latency: Real-time positioning must be <1s.
+
+// Guidelines
+- Use environment variables for all secrets.
+- Prioritize modularity and clean, type-hinted code.
+- Every message, summary, and meeting chunk must have a vector embedding.
+- Maintain identity merging in the `entities` table.
+

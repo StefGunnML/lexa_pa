@@ -1,0 +1,10 @@
+PyQt6
+pyaudio
+faster-whisper
+onnxruntime
+httpx
+python-dotenv
+numpy
+silero-vad
+
+
