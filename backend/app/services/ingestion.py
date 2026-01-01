@@ -1,9 +1,9 @@
 import httpx
 import os
 from sqlalchemy.orm import Session
-from ..models import IngestionAuditLog, SessionLocal
-from .gmail import GmailService
-from .slack import SlackService
+from app.models import IngestionAuditLog, SessionLocal
+from app.services.gmail import GmailService
+from app.services.slack import SlackService
 import logging
 
 logger = logging.getLogger(__name__)

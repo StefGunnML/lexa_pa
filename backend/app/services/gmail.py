@@ -1,8 +1,8 @@
 import httpx
 import os
 from typing import List, Dict, Any
-from .deepseek import DeepSeekService
-from ..models import Thread, Message
+from app.services.deepseek import DeepSeekService
+from app.models import Thread, Message
 from datetime import datetime
 
 class GmailService:

@@ -3,9 +3,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, Dict, Any
 import uvicorn
-from .services.deepseek import DeepSeekService
-from .services.ingestion import process_ingestion
-from .models import get_db_engine, IngestionAuditLog
+from app.services.deepseek import DeepSeekService
+from app.services.ingestion import process_ingestion
+from app.models import get_db_engine, IngestionAuditLog
 from sqlalchemy.orm import sessionmaker
 import asyncio
 import os
