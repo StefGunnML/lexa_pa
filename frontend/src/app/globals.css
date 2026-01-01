@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 215 25% 6%; /* Even Darker Obsidian */
+  --foreground: 210 20% 98%;
+  --card: 215 25% 10%;
+  --card-foreground: 210 20% 95%;
+  --border: 215 20% 18%;
+  --primary: 210 20% 98%;
+  --primary-foreground: 215 25% 10%;
+  --accent: 215 20% 25%;
+  --accent-foreground: 210 20% 98%;
+  --muted: 215 20% 15%;
+  --muted-foreground: 215 15% 80%; /* Increased brightness for skimmability */
+}
+
+@layer base {
+  body {
+    @apply bg-[#080c14] text-[#f8fafc] antialiased;
+    background-image: radial-gradient(circle at 50% -20%, rgba(30, 41, 59, 0.3), transparent);
+  }
+}
+
+.luxury-card {
+  @apply bg-[#111827]/60 border border-slate-800/60 backdrop-blur-md shadow-2xl;
+}
+
+.mercury-border {
+  @apply border border-slate-800/40;
+}
+
+.text-mercury-muted {
+  @apply text-slate-400 font-normal;
+}
+
+.italic-mercury {
+  @apply font-medium text-slate-200 tracking-tight;
+  font-size: 1.1em;
+  line-height: 1.6;
+}
+
+.high-focus-title {
+  @apply text-white font-bold tracking-tight;
+  text-shadow: 0 0 30px rgba(255,255,255,0.05);
+}
