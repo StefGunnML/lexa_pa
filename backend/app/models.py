@@ -83,6 +83,9 @@ def get_db_engine():
         raise ValueError("DATABASE_URL not set")
     return create_engine(db_url)
 
+engine = get_db_engine()
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
 def init_db():
     engine = get_db_engine()
     with engine.connect() as conn:

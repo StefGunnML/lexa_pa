@@ -5,7 +5,7 @@ from typing import Optional, Dict, Any
 import uvicorn
 from app.services.deepseek import DeepSeekService
 from app.services.ingestion import process_ingestion
-from app.models import get_db_engine, IngestionAuditLog, init_db
+from app.models import get_db_engine, IngestionAuditLog, init_db, SessionLocal
 from sqlalchemy.orm import sessionmaker
 import asyncio
 import os
@@ -15,10 +15,6 @@ import uuid
 init_db()
 
 app = FastAPI(title="Project Compass API")
-
-# Setup Database Session
-engine = get_db_engine()
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 app.add_middleware(
     CORSMiddleware,
