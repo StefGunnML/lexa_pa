@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, String, Text, DateTime, JSON, ForeignKey, Table, Float
+from sqlalchemy import create_engine, Column, String, Text, DateTime, JSON, ForeignKey, Table, Float, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.dialects.postgresql import UUID, JSONB
@@ -85,6 +85,9 @@ def get_db_engine():
 
 def init_db():
     engine = get_db_engine()
+    with engine.connect() as conn:
+        conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
+        conn.commit()
     Base.metadata.create_all(engine)
     print("Database tables created.")
 

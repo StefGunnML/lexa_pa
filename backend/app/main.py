@@ -5,11 +5,14 @@ from typing import Optional, Dict, Any
 import uvicorn
 from app.services.deepseek import DeepSeekService
 from app.services.ingestion import process_ingestion
-from app.models import get_db_engine, IngestionAuditLog
+from app.models import get_db_engine, IngestionAuditLog, init_db
 from sqlalchemy.orm import sessionmaker
 import asyncio
 import os
 import uuid
+
+# Initialize Database
+init_db()
 
 app = FastAPI(title="Project Compass API")
 
