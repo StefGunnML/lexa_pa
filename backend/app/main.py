@@ -144,7 +144,7 @@ async def create_nango_session(request: Request):
             data = response.json()
             logger.info(f"[Compass] Nango API status: {response.status_code}")
             
-            if response.status_code != 200:
+            if response.status_code not in [200, 201]:
                 logger.error(f"[Compass] Nango API error: {data}")
                 return {
                     "error": "NANGO_API_ERROR",
@@ -152,8 +152,10 @@ async def create_nango_session(request: Request):
                     "detail": data
                 }
             
-            logger.info("[Compass] Session token created successfully")
-            return data
+            # Nango returns session token inside 'data' object for 201 Created
+            session_data = data.get("data", data)
+            logger.info(f"[Compass] Session token created successfully (token: {session_data.get('token')[:15]}...)")
+            return session_data
         except Exception as e:
             logger.exception(f"[Compass] Backend exception during Nango session creation: {e}")
             return {
