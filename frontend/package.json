@@ -15,7 +15,7 @@
     "lucide-react": "^0.294.0",
     "tailwind-merge": "^2.1.0",
     "clsx": "^2.0.0",
-    "@nangohq/frontend": "^0.1.0"
+    "@nangohq/frontend": "latest"
   },
   "devDependencies": {
     "typescript": "^5",

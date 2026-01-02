@@ -11,12 +11,16 @@ export function Card({ children, className = "" }: { children: React.ReactNode, 
 export function Button({ 
   children, 
   variant = "primary", 
+  size = "default",
   onClick,
+  disabled = false,
   className = ""
 }: { 
   children: React.ReactNode, 
   variant?: "primary" | "secondary" | "destructive" | "outline",
+  size?: "default" | "sm" | "lg",
   onClick?: () => void,
+  disabled?: boolean,
   className?: string
 }) {
   const styles = {
@@ -25,11 +29,18 @@ export function Button({
     destructive: "bg-red-950/20 text-red-400 hover:bg-red-900/30 border border-red-900/30",
     outline: "border border-slate-700 text-slate-300 hover:border-slate-500 hover:text-white"
   };
+
+  const sizes = {
+    default: "px-5 py-2 text-xs",
+    sm: "px-3 py-1 text-[10px]",
+    lg: "px-8 py-3 text-sm"
+  };
   
   return (
     <button 
       onClick={onClick}
-      className={`px-5 py-2 rounded-xl text-xs font-bold tracking-wide transition-all active:scale-[0.98] ${styles[variant]} ${className}`}
+      disabled={disabled}
+      className={`rounded-xl font-bold tracking-wide transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed ${styles[variant]} ${sizes[size]} ${className}`}
     >
       {children}
     </button>
