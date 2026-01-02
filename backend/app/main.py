@@ -132,8 +132,11 @@ async def debug_nango_syncs():
     
     async with httpx.AsyncClient() as client:
         # Check all defined syncs
-        res = await client.get("https://api.nango.dev/sync", headers={"Authorization": f"Bearer {nango_secret}"})
-        return res.json()
+        res = await client.get("https://api.nango.dev/sync", headers={"Authorization": f"Bearer {nango_secret}", "Accept": "application/json"})
+        try:
+            return res.json()
+        except:
+            return {"status": res.status_code, "text": res.text[:500]}
 
 @app.get("/nango/debug-connections")
 async def debug_nango_connections():
