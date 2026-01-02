@@ -133,6 +133,37 @@ async def debug_nango_db():
         "config_keys": [c.key for c in configs]
     }
 
+@app.get("/nango/debug-api-brute")
+async def debug_nango_api_brute():
+    db = SessionLocal()
+    nango_secret_entry = db.query(SystemConfig).filter(SystemConfig.key == "NANGO_SECRET_KEY").first()
+    db.close()
+    nango_secret = nango_secret_entry.value if nango_secret_entry else os.getenv("NANGO_SECRET_KEY")
+    
+    cid = "8bacc2cb-82a8-49de-ac27-35f07f210630"
+    urls = [
+        f"https://api.nango.dev/records?model=gmail-sync&connection_id={cid}",
+        f"https://api.nango.dev/sync/records?model=gmail-sync&connectionId={cid}",
+        f"https://api.nango.dev/sync/gmail-sync/records?connectionId={cid}",
+        f"https://api.nango.dev/proxy/gmail-sync/records?connectionId={cid}",
+        f"https://api.nango.dev/environment",
+        f"https://api.nango.dev/integrations"
+    ]
+    
+    results = {}
+    async with httpx.AsyncClient() as client:
+        for url in urls:
+            try:
+                res = await client.get(url, headers={"Authorization": f"Bearer {nango_secret}", "Accept": "application/json"})
+                results[url] = {
+                    "status": res.status_code,
+                    "is_json": "application/json" in res.headers.get("content-type", ""),
+                    "preview": res.text[:100]
+                }
+            except Exception as e:
+                results[url] = str(e)
+    return results
+
 @app.get("/nango/debug-api-docs")
 async def debug_nango_api_docs():
     # Attempt to fetch something that might show the API version or schema
