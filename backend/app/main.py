@@ -97,63 +97,6 @@ async def update_playbook(data: PlaybookUpdate):
     db.close()
     return {"status": "saved"}
 
-@app.get("/nango/integrations")
-async def list_nango_integrations():
-    """
-    Diagnostic endpoint to find which integration IDs are valid.
-    """
-    db = SessionLocal()
-    nango_secret_entry = db.query(SystemConfig).filter(SystemConfig.key == "NANGO_SECRET_KEY").first()
-    db.close()
-    nango_secret = nango_secret_entry.value if nango_secret_entry else os.getenv("NANGO_SECRET_KEY")
-    
-    if not nango_secret:
-        return {"error": "NANGO_SECRET_KEY_MISSING"}
-        
-    async with httpx.AsyncClient() as client:
-        test_ids = ["google", "google-gmail", "gmail", "gmail-sync", "slack", "slack-messages"]
-        results = {}
-        for tid in test_ids:
-            try:
-                # Try with Nango-Secret header as well
-                headers = {
-                    "Authorization": f"Bearer {nango_secret}", 
-                    "Nango-Secret": nango_secret,
-                    "Content-Type": "application/json"
-                }
-                resp = await client.post(
-                    "https://api.nango.dev/connect/sessions",
-                    headers=headers,
-                    json={
-                        "end_user": {"id": "test-id"},
-                        "allowed_integrations": [tid]
-                    }
-                )
-                results[tid] = resp.status_code
-                if resp.status_code == 200:
-                    logger.info(f"[Compass] SUCCESS for ID: {tid}")
-                else:
-                    logger.info(f"[Compass] FAIL for ID: {tid} - {resp.text}")
-            except Exception as e:
-                results[tid] = str(e)
-        
-        try:
-            response = await client.get(
-                "https://api.nango.dev/integrations",
-                headers={
-                    "Authorization": f"Bearer {nango_secret}",
-                    "Accept": "application/json"
-                }
-            )
-            data = response.json()
-            results["actual_integrations"] = data
-        except Exception as e:
-            results["list_error"] = str(e)
-            
-        return results
-            
-        return results
-
 @app.post("/nango/session")
 async def create_nango_session(request: Request):
     """
@@ -182,7 +125,6 @@ async def create_nango_session(request: Request):
     async with httpx.AsyncClient() as client:
         try:
             logger.info(f"[Compass] Calling Nango API for session token (provider: {provider})")
-            logger.info(f"[Compass] Nango request payload: {{'provider': '{provider}', 'secret_prefix': '{nango_secret[:10] if nango_secret else None}'}}")
             response = await client.post(
                 "https://api.nango.dev/connect/sessions",
                 headers={
@@ -201,7 +143,6 @@ async def create_nango_session(request: Request):
             
             data = response.json()
             logger.info(f"[Compass] Nango API status: {response.status_code}")
-            logger.info(f"[Compass] Nango response: {data}")
             
             if response.status_code != 200:
                 logger.error(f"[Compass] Nango API error: {data}")
@@ -249,8 +190,6 @@ async def nango_webhook(request: Request, background_tasks: BackgroundTasks):
 from fastapi.responses import StreamingResponse
 import asyncio
 
-# ... existing code ...
-
 @app.post("/meeting/positioning")
 async def get_positioning(data: MeetingText):
     """
@@ -265,15 +204,6 @@ async def get_positioning(data: MeetingText):
             playbook_content = f.read()
 
     async def event_generator():
-        # In production, we'd call ds.client.chat.completions.create(
-        #     model=ds.model,
-        #     messages=[
-        #         {"role": "system", "content": f"You are a strategic meeting coach. Playbook: {playbook_content}"},
-        #         {"role": "user", "content": data.text}
-        #     ],
-        #     stream=True
-        # )
-        
         # Simulated conflict detection
         advice = "Tip: Pivot to ROI. Remind them of the 2025 premium agreement if they push for a 20% discount."
         
@@ -292,4 +222,3 @@ async def get_positioning(data: MeetingText):
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
-

@@ -84,12 +84,7 @@ export default function SettingsPage() {
   };
 
   const connectService = async (provider: string) => {
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/b4de5701-9876-47ce-aad5-7d358d247a66',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'settings.tsx:86',message:'connectService called',data:{provider},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'ID_MISMATCH'})}).catch(()=>{});
-    // #endregion
     try {
-      console.log(`[Compass] Initiating connect for ${provider}...`);
-      
       const requestBody = JSON.stringify({ provider });
       const sessionRes = await fetch('/api/nango/session', { 
         method: 'POST',
@@ -101,33 +96,21 @@ export default function SettingsPage() {
       });
       
       const sessionData = await sessionRes.json();
-      // #region agent log
-      fetch('http://127.0.0.1:7243/ingest/b4de5701-9876-47ce-aad5-7d358d247a66',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'settings.tsx:100',message:'Backend response for session',data:sessionData,timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'ID_MISMATCH'})}).catch(()=>{});
-      // #endregion
 
       if (sessionData.error) {
         console.error(`[Compass] Session Error:`, sessionData);
-        alert(`Integration Error: ${sessionData.error}\nMessage: ${sessionData.detail?.error?.message || JSON.stringify(sessionData.detail)}`);
+        alert(`Integration Error: ${sessionData.error}\nMessage: ${sessionData.detail?.error?.message || "Integration not found in Nango dashboard."}`);
         return;
       }
 
       const sessionToken = sessionData.token || sessionData.sessionToken;
-      
-      if (!sessionToken) {
-        alert("Critical Error: No session token received.");
-        return;
-      }
+      if (!sessionToken) return;
 
       const nango = new Nango();
       const connect = nango.openConnectUI({
         onEvent: (event: any) => {
-          // #region agent log
-          fetch('http://127.0.0.1:7243/ingest/b4de5701-9876-47ce-aad5-7d358d247a66',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'settings.tsx:117',message:'Nango event',data:{type:event.type,data:event.data},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'ID_MISMATCH'})}).catch(()=>{});
-          // #endregion
           if (event.type === 'connect') {
             alert(`Successfully connected to ${provider}!`);
-          } else if (event.type === 'error') {
-            alert(`Nango Error: ${JSON.stringify(event.data || event)}`);
           }
         },
       });
@@ -136,7 +119,6 @@ export default function SettingsPage() {
       
     } catch (err: any) {
       console.error(`[Compass] Frontend Crash:`, err);
-      alert(`Frontend Error: ${String(err)}`);
     }
   };
 
@@ -146,7 +128,7 @@ export default function SettingsPage() {
         <div className="flex items-center gap-3">
           <span className="system-label">CALIBRATION: NODE_01</span>
           <span className="system-label">ENCRYPTION: AES-256</span>
-          <span className="system-label bg-red-100 text-red-600 font-bold border-red-200 uppercase">BUILD: NANGO_LOGGER_FIX_V2</span>
+          <span className="system-label bg-green-100 text-green-600 font-bold border-green-200 uppercase">BUILD: READY</span>
         </div>
         <h2 className="text-5xl font-bold tracking-tighter text-foreground">System Command</h2>
         <p className="text-muted-foreground text-xl max-w-2xl font-medium leading-relaxed">
@@ -243,7 +225,7 @@ export default function SettingsPage() {
                       <p className="text-[9px] font-medium text-muted-foreground uppercase tracking-widest">SYNC_READY</p>
                     </div>
                   </div>
-                      <Button size="sm" variant="outline" onClick={() => connectService('gmail-sync')}>Link</Button>
+                      <Button size="sm" variant="outline" onClick={() => connectService('google-gmail')}>Link</Button>
                 </div>
 
                 <div className="p-5 bg-muted border border-border flex items-center justify-between hover:border-foreground/20 transition-all group">
@@ -254,7 +236,7 @@ export default function SettingsPage() {
                       <p className="text-[9px] font-medium text-muted-foreground uppercase tracking-widest">STREAM_READY</p>
                     </div>
                   </div>
-                  <Button size="sm" variant="outline" onClick={() => connectService('slack-messages')}>Link</Button>
+                  <Button size="sm" variant="outline" onClick={() => connectService('slack')}>Link</Button>
                 </div>
               </div>
             </div>
