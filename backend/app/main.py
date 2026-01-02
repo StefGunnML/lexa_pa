@@ -122,15 +122,6 @@ async def create_nango_session(request: Request):
             "status_code": 500
         }
     
-    # Critical Validation: Nango Secret Keys MUST start with sk_
-    if not nango_secret.startswith("sk_"):
-        logger.error(f"[Compass] Invalid NANGO_SECRET_KEY format: starts with {nango_secret[:5]}...")
-        return {
-            "error": "INVALID_SECRET_KEY",
-            "detail": {"error": {"message": "Your NANGO_SECRET_KEY is invalid. It must start with 'sk_prod_' or 'sk_test_'. Check Nango Dashboard > Settings > API Keys."}},
-            "status_code": 400
-        }
-    
     async with httpx.AsyncClient() as client:
         try:
             logger.info(f"[Compass] Calling Nango API for session token (provider: {provider})")
