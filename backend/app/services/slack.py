@@ -19,8 +19,8 @@ class SlackService:
         """
         # 1. Fetch data from Nango (Slack integration)
         async with httpx.AsyncClient() as client:
-            # CORRECT V2 ENDPOINT: /records?model={sync_id}&connectionId={cid}
-            url = f"https://api.nango.dev/records?model=slack-messages&connectionId={connection_id}"
+            # CORRECT V2 ENDPOINT: /records?model={sync_id}&connection_id={cid}
+            url = f"https://api.nango.dev/records?model=slack-messages&connection_id={connection_id}"
             response = await client.get(
                 url,
                 headers={

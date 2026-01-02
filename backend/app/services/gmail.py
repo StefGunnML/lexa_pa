@@ -19,8 +19,8 @@ class GmailService:
         """
         # 1. Fetch data from Nango (Gmail integration)
         async with httpx.AsyncClient() as client:
-            # CORRECT V2 ENDPOINT: /records?model={sync_id}&connectionId={cid}
-            url = f"https://api.nango.dev/records?model={model}&connectionId={connection_id}"
+            # CORRECT V2 ENDPOINT: /records?model={sync_id}&connection_id={cid}
+            url = f"https://api.nango.dev/records?model={model}&connection_id={connection_id}"
             response = await client.get(
                 url,
                 headers={
