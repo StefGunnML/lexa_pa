@@ -97,6 +97,32 @@ async def update_playbook(data: PlaybookUpdate):
     db.close()
     return {"status": "saved"}
 
+@app.get("/nango/debug-records")
+async def debug_nango_records():
+    db = SessionLocal()
+    nango_secret_entry = db.query(SystemConfig).filter(SystemConfig.key == "NANGO_SECRET_KEY").first()
+    db.close()
+    nango_secret = nango_secret_entry.value if nango_secret_entry else os.getenv("NANGO_SECRET_KEY")
+    
+    async with httpx.AsyncClient() as client:
+        # Get connections first to get a valid connectionId
+        conn_res = await client.get("https://api.nango.dev/connection", headers={"Authorization": f"Bearer {nango_secret}"})
+        conns = conn_res.json().get("connections", [])
+        if not conns:
+            return {"error": "No connections found"}
+        
+        cid = conns[0]["connection_id"]
+        # Try to fetch records for common sync IDs
+        sync_ids = ["gmail-sync", "slack-messages"]
+        results = {}
+        for sid in sync_ids:
+            res = await client.get(f"https://api.nango.dev/sync/{sid}/records?connectionId={cid}", headers={"Authorization": f"Bearer {nango_secret}"})
+            results[sid] = {
+                "status": res.status_code,
+                "data": res.json() if res.status_code == 200 else res.text[:200]
+            }
+        return results
+
 @app.get("/nango/debug-syncs")
 async def debug_nango_syncs():
     db = SessionLocal()
