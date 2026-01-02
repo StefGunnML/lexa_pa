@@ -13,10 +13,11 @@ export async function POST(request: NextRequest) {
     let body;
     try {
       body = bodyText ? JSON.parse(bodyText) : {};
-    } catch (e) {
+    } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : 'Unknown parse error';
       console.error('[API Route] JSON parse error:', e);
       return NextResponse.json(
-        { error: 'INVALID_BODY', detail: `Request body is not valid JSON: ${e.message}`, rawBody: bodyText.substring(0, 100) },
+        { error: 'INVALID_BODY', detail: `Request body is not valid JSON: ${errorMessage}`, rawBody: bodyText.substring(0, 100) },
         { status: 400 }
       );
     }

@@ -154,15 +154,15 @@ export default function SettingsPage() {
       // #endregion
       console.log(`[Compass] Opening Connect UI...`);
       const connect = nango.openConnectUI({
-        onEvent: (event) => {
+        onEvent: (event: any) => {
           // #region agent log
-          fetch('http://127.0.0.1:7243/ingest/b4de5701-9876-47ce-aad5-7d358d247a66',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'settings.tsx:123',message:'Nango event received',data:{eventType:event.type,eventData:event.data},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H'})}).catch(()=>{});
+          fetch('http://127.0.0.1:7243/ingest/b4de5701-9876-47ce-aad5-7d358d247a66',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'settings.tsx:123',message:'Nango event received',data:{eventType:event.type,eventData:event.data || null},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H'})}).catch(()=>{});
           // #endregion
-          console.log(`[Compass] Nango Event:`, event.type, event.data);
+          console.log(`[Compass] Nango Event:`, event.type, event.data || '(no data)');
           if (event.type === 'connect') {
             alert(`Successfully connected to ${provider}!`);
           } else if (event.type === 'error') {
-            alert(`Nango Error: ${JSON.stringify(event.data)}`);
+            alert(`Nango Error: ${JSON.stringify(event.data || event)}`);
           } else if (event.type === 'close') {
             console.log(`[Compass] Modal closed by user`);
           }
@@ -264,7 +264,6 @@ export default function SettingsPage() {
               disabled={pulseStatus === 'testing'}
               className="w-full"
               variant="primary"
-              type="button"
             >
               {pulseStatus === 'testing' ? <RefreshCw className="animate-spin" size={16} /> : <Play size={16} className="mr-2" />}
               INITIATE_PULSE_CHECK
@@ -305,7 +304,7 @@ export default function SettingsPage() {
                       <p className="text-[9px] font-medium text-muted-foreground uppercase tracking-widest">SYNC_READY</p>
                     </div>
                   </div>
-                  <Button size="sm" variant="outline" type="button" onClick={() => connectService('google')}>Link</Button>
+                  <Button size="sm" variant="outline" onClick={() => connectService('google')}>Link</Button>
                 </div>
 
                 <div className="p-5 bg-muted border border-border flex items-center justify-between hover:border-foreground/20 transition-all group">
@@ -316,7 +315,7 @@ export default function SettingsPage() {
                       <p className="text-[9px] font-medium text-muted-foreground uppercase tracking-widest">STREAM_READY</p>
                     </div>
                   </div>
-                  <Button size="sm" variant="outline" type="button" onClick={() => connectService('slack')}>Link</Button>
+                  <Button size="sm" variant="outline" onClick={() => connectService('slack')}>Link</Button>
                 </div>
               </div>
             </div>
