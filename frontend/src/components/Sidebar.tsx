@@ -10,6 +10,7 @@ export function Sidebar() {
     { name: 'Staging', href: '/dashboard/staging' },
     { name: 'Inbox', href: '/dashboard/threads' },
     { name: 'Session', href: '/dashboard/meetings' },
+    { name: 'Setup', href: '/dashboard/settings' },
   ];
 
   return (

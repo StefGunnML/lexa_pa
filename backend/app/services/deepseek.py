@@ -1,14 +1,24 @@
 import os
 from openai import OpenAI
 from typing import Dict, Any
+from app.models import SessionLocal, SystemConfig
 
 class DeepSeekService:
     def __init__(self):
+        db = SessionLocal()
+        api_key = db.query(SystemConfig).filter(SystemConfig.key == "DEEPSEEK_API_KEY").first()
+        base_url = db.query(SystemConfig).filter(SystemConfig.key == "DEEPSEEK_API_BASE").first()
+        model = db.query(SystemConfig).filter(SystemConfig.key == "DEEPSEEK_MODEL").first()
+        db.close()
+
+        self.api_key = api_key.value if api_key else os.getenv("DEEPSEEK_API_KEY")
+        self.base_url = base_url.value if base_url else os.getenv("DEEPSEEK_API_BASE")
+        self.model = model.value if model else os.getenv("DEEPSEEK_MODEL", "deepseek-v3")
+
         self.client = OpenAI(
-            api_key=os.getenv("DEEPSEEK_API_KEY"),
-            base_url=os.getenv("DEEPSEEK_API_BASE")
+            api_key=self.api_key,
+            base_url=self.base_url
         )
-        self.model = os.getenv("DEEPSEEK_MODEL", "deepseek-v3")
 
     async def summarize_thread(self, current_summary: Dict[str, Any], new_message: str) -> Dict[str, Any]:
         """

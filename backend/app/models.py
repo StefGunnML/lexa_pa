@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, String, Text, DateTime, JSON, ForeignKey, Table, Float, text
+from sqlalchemy import create_engine, Column, String, Text, DateTime, JSON, ForeignKey, Table, Float, text, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.dialects.postgresql import UUID, JSONB
@@ -73,6 +73,21 @@ class IngestionAuditLog(Base):
     status = Column(String, default='received')
     error_message = Column(Text)
     created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
+
+class SystemConfig(Base):
+    __tablename__ = 'system_config'
+    key = Column(String, primary_key=True)
+    value = Column(String, nullable=False)
+    description = Column(String)
+    updated_at = Column(DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow)
+
+class Playbook(Base):
+    __tablename__ = 'playbook'
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    content = Column(Text, nullable=False)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
+    updated_at = Column(DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow)
 
 # Note: pgvector specific columns and indexes are best handled via raw SQL or specialized extensions
 # like pgvector-python. For this scaffold, we'll stick to basic SQLAlchemy.

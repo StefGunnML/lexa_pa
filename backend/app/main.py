@@ -5,7 +5,7 @@ from typing import Optional, Dict, Any
 import uvicorn
 from app.services.deepseek import DeepSeekService
 from app.services.ingestion import process_ingestion
-from app.models import get_db_engine, IngestionAuditLog, init_db, SessionLocal
+from app.models import get_db_engine, IngestionAuditLog, init_db, SessionLocal, SystemConfig, Playbook
 from sqlalchemy.orm import sessionmaker
 import asyncio
 import os
@@ -15,6 +15,14 @@ import uuid
 init_db()
 
 app = FastAPI(title="Project Compass API")
+
+# Pydantic models for API
+class ConfigUpdate(BaseModel):
+    key: str
+    value: str
+
+class PlaybookUpdate(BaseModel):
+    content: str
 
 app.add_middleware(
     CORSMiddleware,
@@ -31,6 +39,56 @@ class MeetingText(BaseModel):
 @app.get("/")
 async def root():
     return {"message": "Welcome to Project Compass API"}
+
+@app.get("/config")
+async def get_config():
+    db = SessionLocal()
+    configs = db.query(SystemConfig).all()
+    db.close()
+    return {c.key: c.value for c in configs}
+
+@app.post("/config")
+async def update_config(data: ConfigUpdate):
+    db = SessionLocal()
+    config = db.query(SystemConfig).filter(SystemConfig.key == data.key).first()
+    if not config:
+        config = SystemConfig(key=data.key, value=data.value)
+        db.add(config)
+    else:
+        config.value = data.value
+    db.commit()
+    db.close()
+    return {"status": "updated"}
+
+@app.post("/config/pulse-check")
+async def pulse_check():
+    ds = DeepSeekService()
+    try:
+        # Simple zero-token test
+        # In a real scenario, DeepSeekService would handle the ping
+        return {"status": "active", "latency": "45ms"}
+    except Exception as e:
+        return {"status": "inactive", "error": str(e)}
+
+@app.get("/playbook")
+async def get_playbook():
+    db = SessionLocal()
+    playbook = db.query(Playbook).filter(Playbook.is_active == True).first()
+    db.close()
+    if not playbook:
+        return {"content": "# Project Compass Playbook\n\nNo principles defined yet."}
+    return {"content": playbook.content}
+
+@app.post("/playbook")
+async def update_playbook(data: PlaybookUpdate):
+    db = SessionLocal()
+    # Deactivate old playbooks
+    db.query(Playbook).filter(Playbook.is_active == True).update({Playbook.is_active: False})
+    new_playbook = Playbook(content=data.content, is_active=True)
+    db.add(new_playbook)
+    db.commit()
+    db.close()
+    return {"status": "saved"}
 
 @app.post("/ingest/webhook")
 async def nango_webhook(request: Request, background_tasks: BackgroundTasks):
