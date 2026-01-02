@@ -97,6 +97,23 @@ async def update_playbook(data: PlaybookUpdate):
     db.close()
     return {"status": "saved"}
 
+@app.get("/nango/debug-config")
+async def debug_nango_config():
+    db = SessionLocal()
+    nango_secret_entry = db.query(SystemConfig).filter(SystemConfig.key == "NANGO_SECRET_KEY").first()
+    db.close()
+    nango_secret = nango_secret_entry.value if nango_secret_entry else os.getenv("NANGO_SECRET_KEY")
+    
+    async with httpx.AsyncClient() as client:
+        # Check integrations
+        int_res = await client.get("https://api.nango.dev/integrations", headers={"Authorization": f"Bearer {nango_secret}"})
+        # Check specific google-mail setup
+        detail_res = await client.get("https://api.nango.dev/integrations/google-mail", headers={"Authorization": f"Bearer {nango_secret}"})
+        return {
+            "integrations": int_res.json(),
+            "google_mail_detail": detail_res.json()
+        }
+
 @app.post("/nango/session")
 async def create_nango_session(request: Request):
     """
