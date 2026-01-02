@@ -12,23 +12,6 @@ export default function SettingsPage() {
     NANGO_SECRET_KEY: '',
   });
 
-  // #region agent log
-  useEffect(() => {
-    fetch('http://127.0.0.1:7243/ingest/b4de5701-9876-47ce-aad5-7d358d247a66', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        location: 'settings/page.tsx:useEffect',
-        message: 'SettingsPage mounted',
-        data: { nangoKeySet: !!process.env.NEXT_PUBLIC_NANGO_PUBLIC_KEY },
-        timestamp: Date.now(),
-        sessionId: 'debug-session',
-        hypothesisId: '5'
-      })
-    }).catch(() => {});
-  }, []);
-  // #endregion
-
   const [playbook, setPlaybook] = useState('');
   const [pulseStatus, setPulseStatus] = useState<'idle' | 'testing' | 'active' | 'error'>('idle');
   const [saving, setSaving] = useState(false);

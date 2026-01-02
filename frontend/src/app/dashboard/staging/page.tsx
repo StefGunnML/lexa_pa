@@ -17,26 +17,6 @@ export default function StagingArea() {
   const [actions, setActions] = useState<PendingAction[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // #region agent log
-  useEffect(() => {
-    fetch('http://127.0.0.1:7243/ingest/b4de5701-9876-47ce-aad5-7d358d247a66', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        location: 'staging/page.tsx:StagingArea',
-        message: 'Checking StagingArea Implementation',
-        data: {
-          hasActionBar: true, // This version has the action bar at the bottom
-          buttonColor: 'black'
-        },
-        timestamp: Date.now(),
-        sessionId: 'debug-session',
-        hypothesisId: 'H1'
-      })
-    }).catch(() => {});
-  }, []);
-  // #endregion
-
   useEffect(() => {
     // Simulated fetch from FastAPI
     const mockActions: PendingAction[] = [
@@ -96,9 +76,8 @@ export default function StagingArea() {
         <div className="flex items-center gap-3">
           <span className="system-label">NODE: ACTIVE</span>
           <span className="system-label">CONTEXT: STRATEGIC</span>
-          <span className="system-label text-red-500 font-bold">BUILD: 7949b38</span>
         </div>
-        <h2 className="text-5xl font-bold tracking-tighter text-foreground uppercase">STAGING_V2</h2>
+        <h2 className="text-5xl font-bold tracking-tighter text-foreground">Staging Area</h2>
         <p className="text-muted-foreground text-xl max-w-2xl font-medium leading-relaxed">
           Intelligence synthesized from multi-node streams. Review and authorize <span className="text-foreground font-bold underline decoration-border decoration-2 underline-offset-4">strategic actions</span>.
         </p>
