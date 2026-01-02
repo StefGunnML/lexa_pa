@@ -139,19 +139,18 @@ async def list_nango_integrations():
         
         try:
             response = await client.get(
-                "https://api.nango.dev/config",
+                "https://api.nango.io/config",
                 headers={
                     "Authorization": f"Bearer {nango_secret}",
                     "Accept": "application/json"
                 }
             )
             raw_text = response.text
-            logger.info(f"[Compass] Nango Raw Response (with Accept header): {raw_text}")
+            logger.info(f"[Compass] Nango Raw Response (.io): {raw_text}")
             data = response.json()
-            results["actual_integrations"] = [item.get("unique_key") for item in data.get("configs", [])]
+            results["actual_integrations_io"] = [item.get("unique_key") for item in data.get("configs", [])]
         except Exception as e:
-            results["list_error"] = str(e)
-            results["raw_text_preview"] = raw_text[:200] if 'raw_text' in locals() else None
+            results["list_error_io"] = str(e)
             
         return results
 
