@@ -85,6 +85,12 @@ export default function SettingsPage() {
 
   const connectService = async (provider: string) => {
     try {
+      // Basic check for Nango Secret Key format
+      if (config.NANGO_SECRET_KEY && !config.NANGO_SECRET_KEY.startsWith('sk_')) {
+        alert("Wait! Your NANGO_SECRET_KEY doesn't look right. It should start with 'sk_prod_' or 'sk_test_'. Please check your Nango Dashboard (Settings > API Keys).");
+        return;
+      }
+
       const requestBody = JSON.stringify({ provider });
       const sessionRes = await fetch('/api/nango/session', { 
         method: 'POST',
@@ -99,7 +105,12 @@ export default function SettingsPage() {
 
       if (sessionData.error) {
         console.error(`[Compass] Session Error:`, sessionData);
-        alert(`Integration Error: ${sessionData.error}\nMessage: ${sessionData.detail?.error?.message || "Integration not found in Nango dashboard."}`);
+        const errorMsg = sessionData.detail?.error?.message || "";
+        if (errorMsg.includes("Integration does not exist")) {
+          alert(`Almost there! You need to add the "${provider}" integration in your Nango Dashboard.\n\n1. Go to Nango > Integrations\n2. Add the integration\n3. Set the "Unique Key" to exactly: ${provider}`);
+        } else {
+          alert(`Integration Error: ${sessionData.error}\n${errorMsg}`);
+        }
         return;
       }
 
