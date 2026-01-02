@@ -97,6 +97,31 @@ async def update_playbook(data: PlaybookUpdate):
     db.close()
     return {"status": "saved"}
 
+@app.get("/nango/integrations")
+async def list_nango_integrations():
+    """
+    Diagnostic endpoint to list all configured integrations in Nango.
+    """
+    db = SessionLocal()
+    nango_secret_entry = db.query(SystemConfig).filter(SystemConfig.key == "NANGO_SECRET_KEY").first()
+    db.close()
+    nango_secret = nango_secret_entry.value if nango_secret_entry else os.getenv("NANGO_SECRET_KEY")
+    
+    if not nango_secret:
+        return {"error": "NANGO_SECRET_KEY_MISSING"}
+        
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.get(
+                "https://api.nango.dev/config",
+                headers={"Authorization": f"Bearer {nango_secret}"}
+            )
+            data = response.json()
+            logger.info(f"[Compass] Nango Integrations: {data}")
+            return data
+        except Exception as e:
+            return {"error": str(e)}
+
 @app.post("/nango/session")
 async def create_nango_session(request: Request):
     """
