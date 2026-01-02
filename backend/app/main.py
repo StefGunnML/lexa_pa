@@ -100,7 +100,7 @@ async def update_playbook(data: PlaybookUpdate):
 @app.get("/nango/integrations")
 async def list_nango_integrations():
     """
-    Diagnostic endpoint to list all configured integrations in Nango.
+    Diagnostic endpoint to find which integration IDs are valid.
     """
     db = SessionLocal()
     nango_secret_entry = db.query(SystemConfig).filter(SystemConfig.key == "NANGO_SECRET_KEY").first()
@@ -111,18 +111,27 @@ async def list_nango_integrations():
         return {"error": "NANGO_SECRET_KEY_MISSING"}
         
     async with httpx.AsyncClient() as client:
-        try:
-            response = await client.get(
-                "https://api.nango.dev/config",
-                headers={"Authorization": f"Bearer {nango_secret}"}
-            )
-            raw_text = response.text
-            logger.info(f"[Compass] Nango Raw Response: {raw_text}")
-            data = response.json()
-            logger.info(f"[Compass] Nango Integrations: {data}")
-            return data
-        except Exception as e:
-            return {"error": str(e)}
+        test_ids = ["google", "google-gmail", "gmail", "gmail-sync", "slack", "slack-messages"]
+        results = {}
+        for tid in test_ids:
+            try:
+                # Try to create a session for each ID to see if Nango accepts it
+                resp = await client.post(
+                    "https://api.nango.dev/connect/sessions",
+                    headers={"Authorization": f"Bearer {nango_secret}", "Content-Type": "application/json"},
+                    json={
+                        "end_user": {"id": "test-id"},
+                        "allowed_integrations": [tid]
+                    }
+                )
+                results[tid] = resp.status_code
+                if resp.status_code == 200:
+                    logger.info(f"[Compass] SUCCESS for ID: {tid}")
+                else:
+                    logger.info(f"[Compass] FAIL for ID: {tid} - {resp.text}")
+            except Exception as e:
+                results[tid] = str(e)
+        return results
 
 @app.post("/nango/session")
 async def create_nango_session(request: Request):
