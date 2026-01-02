@@ -231,7 +231,7 @@ export default function SettingsPage() {
                       <p className="text-[9px] font-medium text-muted-foreground uppercase tracking-widest">SYNC_READY</p>
                     </div>
                   </div>
-                      <Button size="sm" variant="outline" onClick={() => connectService('google-gmail')}>Link</Button>
+                      <Button size="sm" variant="outline" onClick={() => connectService('google-mail')}>Link</Button>
                 </div>
 
                 <div className="p-5 bg-muted border border-border flex items-center justify-between hover:border-foreground/20 transition-all group">
