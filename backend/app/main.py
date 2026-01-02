@@ -97,6 +97,22 @@ async def update_playbook(data: PlaybookUpdate):
     db.close()
     return {"status": "saved"}
 
+@app.get("/nango/debug-db")
+async def debug_nango_db():
+    db = SessionLocal()
+    logs = db.query(IngestionAuditLog).order_by(IngestionAuditLog.created_at.desc()).limit(10).all()
+    configs = db.query(SystemConfig).all()
+    db.close()
+    return {
+        "recent_audit_logs": [{
+            "id": l.id,
+            "platform": l.source_platform,
+            "status": l.status,
+            "created": l.created_at
+        } for l in logs],
+        "config_keys": [c.key for c in configs]
+    }
+
 @app.post("/nango/trigger-sync")
 async def trigger_nango_sync(request: Request):
     db = SessionLocal()
