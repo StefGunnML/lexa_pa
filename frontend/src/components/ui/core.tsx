@@ -2,7 +2,7 @@ import React from 'react';
 
 export function Card({ children, className = "" }: { children: React.ReactNode, className?: string }) {
   return (
-    <div className={`luxury-card rounded-2xl p-10 ${className}`}>
+    <div className={`luxury-card p-10 font-mono ${className}`}>
       {children}
     </div>
   );
@@ -24,23 +24,23 @@ export function Button({
   className?: string
 }) {
   const styles = {
-    primary: "bg-[#0f172a] text-white hover:bg-black shadow-[0_4px_14px_rgba(0,0,0,0.1)]",
-    secondary: "bg-slate-100 text-slate-900 hover:bg-slate-200 border border-slate-200",
-    destructive: "bg-red-50 text-red-600 hover:bg-red-100 border border-red-100",
-    outline: "border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900 bg-white"
+    primary: "bg-[#FFB000] text-black hover:bg-[#FFB000]/90 shadow-[0_0_15px_rgba(255,176,0,0.4)]",
+    secondary: "bg-black text-[#FFB000] border border-[#FFB000]/40 hover:bg-[#FFB000]/10",
+    destructive: "bg-black text-red-500 border border-red-500/40 hover:bg-red-500/10",
+    outline: "border border-[#FFB000]/20 text-[#FFB000]/60 hover:border-[#FFB000]/60 hover:text-[#FFB000] bg-transparent"
   };
 
   const sizes = {
-    default: "px-6 py-3 text-xs",
-    sm: "px-4 py-1.5 text-[10px]",
-    lg: "px-10 py-4 text-sm uppercase tracking-widest"
+    default: "px-6 py-3 text-xs uppercase tracking-widest",
+    sm: "px-4 py-1.5 text-[10px] uppercase tracking-widest",
+    lg: "px-10 py-4 text-sm uppercase tracking-[0.2em]"
   };
   
   return (
     <button 
       onClick={onClick}
       disabled={disabled}
-      className={`rounded-xl font-bold transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed ${styles[variant]} ${sizes[size]} ${className}`}
+      className={`font-mono font-bold transition-all active:scale-[0.98] disabled:opacity-30 disabled:cursor-not-allowed ${styles[variant]} ${sizes[size]} ${className}`}
     >
       {children}
     </button>
@@ -49,13 +49,13 @@ export function Button({
 
 export function Badge({ children, variant = "default", className = "" }: { children: React.ReactNode, variant?: "default" | "warning" | "success", className?: string }) {
   const styles = {
-    default: "bg-slate-100 text-slate-600 border border-slate-200",
-    warning: "bg-amber-50 text-amber-700 border border-amber-200",
-    success: "bg-emerald-50 text-emerald-700 border border-emerald-200"
+    default: "border border-[#FFB000]/30 text-[#FFB000]/60",
+    warning: "border border-amber-500 text-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.2)]",
+    success: "border border-emerald-500 text-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.2)]"
   };
   
   return (
-    <span className={`px-3 py-1 rounded-lg text-[10px] font-bold tracking-wider uppercase ${styles[variant]} ${className}`}>
+    <span className={`px-3 py-1 font-mono text-[10px] font-bold tracking-widest uppercase ${styles[variant]} ${className}`}>
       {children}
     </span>
   );

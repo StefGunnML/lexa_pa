@@ -38,44 +38,44 @@ export default function MeetingsSession() {
   }, []);
 
   return (
-    <div className="space-y-16">
+    <div className="space-y-16 font-mono">
       <header className="space-y-6">
         <div className="flex items-center gap-2">
-          <span className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em]">Post-Session Intel</span>
+          <span className="text-[11px] font-bold text-[#FFB000]/40 uppercase tracking-[0.4em]">POST_SESSION_ANALYSIS_BUFFER</span>
         </div>
-        <h2 className="text-6xl font-bold tracking-tight text-slate-900">Session</h2>
-        <p className="text-slate-500 text-xl max-w-2xl font-normal leading-relaxed">
-          Historical positioning intelligence and extracted commitments. Review the <span className="text-slate-900 font-semibold">strategic shifts</span> from your past meetings.
+        <h2 className="text-6xl font-bold tracking-tighter text-[#FFB000] uppercase animate-flicker">Session</h2>
+        <p className="text-[#FFB000]/60 text-xl max-w-2xl font-medium leading-relaxed uppercase">
+          De-serializing meeting intelligence... <span className="text-[#FFB000] underline underline-offset-8">strategic_pivots</span> extracted and indexed.
         </p>
       </header>
 
       {loading ? (
         <div className="flex flex-col items-center justify-center p-32 gap-6">
-          <div className="w-10 h-10 border-t-2 border-slate-900 rounded-full animate-spin"></div>
-          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em]">Analyzing Sessions</p>
+          <div className="w-10 h-10 border-t-2 border-[#FFB000] animate-spin"></div>
+          <p className="text-[11px] font-bold text-[#FFB000] uppercase tracking-[0.2em]">DECODING_SESSION_LOGS</p>
         </div>
       ) : (
         <div className="space-y-8">
           {meetings.map(meeting => (
-            <Card key={meeting.id} className="hover:shadow-[0_20px_50px_rgba(0,0,0,0.06)] border-slate-200/60 transition-all duration-500 p-10">
+            <Card key={meeting.id} className="border-[#FFB000]/20 hover:border-[#FFB000]/50 transition-all duration-300 p-10">
               <div className="flex flex-col md:flex-row justify-between gap-16">
                 <div className="flex-1 space-y-10">
                   <div className="space-y-2">
                     <div className="flex items-center gap-4">
-                      <Badge variant="success" className="font-bold">Session Log</Badge>
-                      <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-                        {new Date(meeting.start_time).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}
+                      <Badge variant="success" className="font-bold border-emerald-500/40">SESSION_LOG_READY</Badge>
+                      <span className="text-[11px] font-bold text-[#FFB000]/40 uppercase tracking-widest">
+                        {new Date(meeting.start_time).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase()}
                       </span>
                     </div>
-                    <h3 className="text-3xl font-bold text-slate-900 tracking-tight">{meeting.title}</h3>
+                    <h3 className="text-3xl font-bold text-[#FFB000] tracking-tighter uppercase">{meeting.title}</h3>
                   </div>
 
                   <div className="space-y-4">
-                    <div className="flex items-center gap-3 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                      Strategic Positioning
+                    <div className="flex items-center gap-3 text-[10px] font-bold text-[#FFB000]/40 uppercase tracking-widest">
+                      [STRATEGIC_POSITIONING]
                     </div>
-                    <div className="p-8 bg-slate-50 border border-slate-100 rounded-2xl">
-                      <p className="text-base text-slate-600 leading-relaxed italic-mercury">
+                    <div className="p-8 bg-black border border-[#FFB000]/10 italic">
+                      <p className="text-base text-[#FFB000]/80 leading-relaxed uppercase tracking-tight">
                         "{meeting.positioning_notes}"
                       </p>
                     </div>
@@ -83,14 +83,14 @@ export default function MeetingsSession() {
                 </div>
 
                 <div className="w-full md:w-72 space-y-6">
-                  <div className="flex items-center gap-3 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                    Commitments
+                  <div className="flex items-center gap-3 text-[10px] font-bold text-[#FFB000]/40 uppercase tracking-widest">
+                    [COMMITMENTS_LOG]
                   </div>
                   <ul className="space-y-4">
                     {meeting.action_items.map((item, i) => (
                       <li key={i} className="flex items-start gap-4">
-                        <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-slate-200 shrink-0"></div>
-                        <span className="text-sm font-medium text-slate-500 leading-snug">{item}</span>
+                        <div className="mt-1.5 w-1.5 h-1.5 bg-[#FFB000]/40 shrink-0"></div>
+                        <span className="text-sm font-medium text-[#FFB000]/60 leading-snug uppercase tracking-tighter">{item}</span>
                       </li>
                     ))}
                   </ul>

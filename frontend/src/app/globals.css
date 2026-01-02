@@ -3,53 +3,83 @@
 @tailwind utilities;
 
 :root {
-  --background: 0 0% 100%; /* Pure Paper White */
-  --foreground: 222 47% 11%; /* Charcoal Ink #0f172a */
-  --card: 0 0% 100%;
-  --card-foreground: 222 47% 11%;
-  --border: 214 32% 91%; /* Soft Pearl Border */
-  --primary: 222 47% 11%;
-  --primary-foreground: 210 40% 98%;
-  --accent: 210 40% 96%;
-  --accent-foreground: 222 47% 11%;
-  --muted: 210 40% 96%;
-  --muted-foreground: 215 16% 47%; /* Sophisticated Gray */
+  --background: 0 0% 2%; /* Machined Graphite #050505 */
+  --foreground: 38 100% 50%; /* High-Density Amber Phosphor #FFB000 */
+  --card: 0 0% 4%;
+  --card-foreground: 38 100% 50%;
+  --border: 38 100% 20%; /* Dim Amber for grid/borders */
+  --primary: 38 100% 50%;
+  --primary-foreground: 0 0% 0%;
+  --accent: 38 100% 15%;
+  --accent-foreground: 38 100% 50%;
+  --muted: 0 0% 8%;
+  --muted-foreground: 38 50% 30%; /* Dimmer Amber */
 }
 
 @layer base {
   body {
-    @apply bg-[#f8fafc] text-[#0f172a] antialiased;
-    background-image: radial-gradient(circle at 50% 0%, #ffffff, transparent);
+    @apply bg-[#050505] text-[#FFB000] antialiased selection:bg-[#FFB000]/20;
+    /* Subtle scanline effect */
+    background-image: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                      linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    background-size: 100% 2px, 3px 100%;
   }
 }
 
 .luxury-card {
-  @apply bg-white border border-slate-200/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] backdrop-blur-sm transition-all duration-300;
+  @apply bg-black/80 border border-[#FFB000]/30 shadow-[0_0_15px_rgba(255,176,0,0.05)] relative overflow-hidden;
+}
+
+.luxury-card::before {
+  content: "";
+  @apply absolute inset-0 pointer-events-none opacity-[0.03];
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 1px,
+    #FFB000 2px
+  );
 }
 
 .mercury-border {
-  @apply border border-slate-200;
+  @apply border border-[#FFB000]/20;
 }
 
 .text-mercury-muted {
-  @apply text-slate-500 font-normal;
+  @apply text-[#FFB000]/40 font-mono uppercase text-[10px] tracking-widest;
 }
 
 .italic-mercury {
-  @apply font-medium text-slate-800 tracking-tight;
-  font-size: 1.1em;
-  line-height: 1.6;
+  @apply font-mono text-[#FFB000] tracking-tight;
+  font-size: 1em;
+  line-height: 1.5;
 }
 
 .high-focus-title {
-  @apply text-slate-900 font-bold tracking-tight;
+  @apply text-[#FFB000] font-mono font-bold uppercase tracking-tight;
+  text-shadow: 0 0 10px rgba(255,176,0,0.3);
+}
+
+@keyframes flicker {
+  0% { opacity: 0.97; }
+  5% { opacity: 0.95; }
+  10% { opacity: 0.9; }
+  15% { opacity: 0.95; }
+  20% { opacity: 0.98; }
+  25% { opacity: 0.95; }
+  30% { opacity: 0.9; }
+  100% { opacity: 1; }
+}
+
+.animate-flicker {
+  animation: flicker 0.15s infinite;
 }
 
 @keyframes breathe {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.02); opacity: 0.9; }
+  0%, 100% { opacity: 1; box-shadow: 0 0 15px rgba(255,176,0,0.1); }
+  50% { opacity: 0.8; box-shadow: 0 0 25px rgba(255,176,0,0.3); }
 }
 
 .animate-breathe {
-  animation: breathe 4s ease-in-out infinite;
+  animation: breathe 3s ease-in-out infinite;
 }
