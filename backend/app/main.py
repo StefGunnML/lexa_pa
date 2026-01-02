@@ -11,6 +11,11 @@ from sqlalchemy.orm import sessionmaker
 import asyncio
 import os
 import uuid
+import logging
+
+# Setup Logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Initialize Database
 init_db()
