@@ -93,11 +93,14 @@ async def update_playbook(data: PlaybookUpdate):
     return {"status": "saved"}
 
 @app.post("/nango/session")
-async def create_nango_session():
+async def create_nango_session(request: Request):
     """
     Creates a Nango Connect Session token.
-    Returns detailed errors for debugging.
+    Accepts 'provider' in request body to specify which integration to allow.
     """
+    body = await request.json()
+    provider = body.get("provider", "google-gmail")  # Default to Gmail
+    
     db = SessionLocal()
     nango_secret_entry = db.query(SystemConfig).filter(SystemConfig.key == "NANGO_SECRET_KEY").first()
     db.close()
@@ -124,7 +127,8 @@ async def create_nango_session():
                         "id": "stefan-primary",
                         "email": "stefan@example.com",
                         "display_name": "Stefan"
-                    }
+                    },
+                    "allowed_integrations": [provider]  # Restrict to the requested provider
                 }
             )
             

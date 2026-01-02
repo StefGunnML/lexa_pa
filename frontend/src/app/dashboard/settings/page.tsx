@@ -87,10 +87,14 @@ export default function SettingsPage() {
     try {
       console.log(`[Compass] Initiating connect for ${provider}...`);
       
-      // 1. Get a session token from our backend
+      // 1. Get a session token from our backend (specify which provider we want)
       const sessionRes = await fetch('/api/nango/session', { 
         method: 'POST',
-        headers: { 'Accept': 'application/json' }
+        headers: { 
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ provider })
       });
       
       const sessionData = await sessionRes.json();
@@ -110,8 +114,9 @@ export default function SettingsPage() {
       // 2. Initialize Nango
       const nango = new Nango();
       
-      // 3. Open the Connect UI
+      // 3. Open the Connect UI with the provider specified
       const connect = nango.openConnectUI({
+        providerConfigKey: provider, // This tells Nango which integration to show
         onEvent: (event) => {
           console.log(`[Compass] Nango Event:`, event.type, event.data);
           if (event.type === 'connect') {
@@ -136,7 +141,7 @@ export default function SettingsPage() {
         <div className="flex items-center gap-3">
           <span className="system-label">CALIBRATION: NODE_01</span>
           <span className="system-label">ENCRYPTION: AES-256</span>
-          <span className="system-label bg-red-100 text-red-600 font-bold border-red-200 uppercase">BUILD: NANGO_DEBUG_V2</span>
+          <span className="system-label bg-red-100 text-red-600 font-bold border-red-200 uppercase">BUILD: NANGO_V3_FIX</span>
         </div>
         <h2 className="text-5xl font-bold tracking-tighter text-foreground">System Command</h2>
         <p className="text-muted-foreground text-xl max-w-2xl font-medium leading-relaxed">
