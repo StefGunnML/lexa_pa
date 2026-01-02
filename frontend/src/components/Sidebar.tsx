@@ -39,28 +39,28 @@ export function Sidebar() {
   ];
 
   return (
-    <aside className="w-64 border-r border-slate-800 bg-[#0f172a] p-8 flex flex-col">
-      <div className="flex items-center gap-3 mb-16">
-        <div className="w-8 h-8 rounded bg-white flex items-center justify-center">
-          <span className="text-black font-semibold text-xs tracking-tighter italic">C</span>
+    <aside className="w-72 border-r border-white/[0.05] bg-black p-10 flex flex-col">
+      <div className="flex items-center gap-4 mb-20">
+        <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+          <span className="text-black font-bold text-sm tracking-tighter italic">C</span>
         </div>
-        <h1 className="text-sm font-semibold tracking-[0.2em] text-white/90 uppercase">
+        <h1 className="text-sm font-bold tracking-[0.3em] text-white uppercase">
           COMPASS
         </h1>
       </div>
       
-      <nav className="space-y-8 flex-1">
-        <div className="space-y-3">
-          <p className="text-[10px] font-semibold text-slate-500 tracking-[0.15em] uppercase ml-1">Workspace</p>
+      <nav className="space-y-10 flex-1">
+        <div className="space-y-4">
+          <p className="text-[10px] font-black text-white/30 tracking-[0.2em] uppercase ml-1">Workspace</p>
           {navItems.map((item) => {
             const isActive = pathname === item.href || (item.href !== '/dashboard/staging' && pathname?.startsWith(item.href));
             return (
               <Link 
                 key={item.name} 
                 href={item.href} 
-                className={`flex items-center gap-3 py-2 px-1 text-sm transition-all group ${isActive ? 'text-white' : 'text-slate-400 hover:text-white'}`}
+                className={`flex items-center gap-4 py-3 px-1 text-[0.95rem] transition-all group ${isActive ? 'text-white font-bold' : 'text-white/40 hover:text-white/80'}`}
               >
-                <div className={`w-1 h-1 rounded-full transition-all ${isActive ? 'bg-white' : 'bg-transparent border border-slate-700 group-hover:border-slate-400'}`}></div>
+                <div className={`w-1.5 h-1.5 rounded-full transition-all duration-500 ${isActive ? 'bg-white shadow-[0_0_10px_rgba(255,255,255,0.8)] scale-125' : 'bg-transparent border border-white/20 group-hover:border-white/40'}`}></div>
                 {item.name}
               </Link>
             );
@@ -68,11 +68,11 @@ export function Sidebar() {
         </div>
       </nav>
       
-      <div className="pt-8 border-t border-slate-800/50">
-        <div className="flex items-center gap-3 px-1">
-          <div className="w-2 h-2 rounded-full bg-slate-500 animate-pulse"></div>
+      <div className="pt-10 border-t border-white/[0.05]">
+        <div className="flex items-center gap-4 px-1 opacity-50 hover:opacity-100 transition-opacity">
+          <div className="w-2 h-2 rounded-full bg-white animate-pulse shadow-[0_0_8px_rgba(255,255,255,0.5)]"></div>
           <div>
-            <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest italic">Encrypted Node</p>
+            <p className="text-[10px] font-bold text-white uppercase tracking-[0.2em] italic">Encrypted Node</p>
           </div>
         </div>
       </div>

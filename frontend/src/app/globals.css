@@ -3,45 +3,55 @@
 @tailwind utilities;
 
 :root {
-  --background: 215 25% 6%; /* Even Darker Obsidian */
+  --background: 0 0% 2%; /* Absolute Obsidian #050505 */
   --foreground: 210 20% 98%;
-  --card: 215 25% 10%;
-  --card-foreground: 210 20% 95%;
-  --border: 215 20% 18%;
+  --card: 0 0% 4%;
+  --card-foreground: 210 20% 98%;
+  --border: 0 0% 12%;
   --primary: 210 20% 98%;
-  --primary-foreground: 215 25% 10%;
-  --accent: 215 20% 25%;
+  --primary-foreground: 0 0% 2%;
+  --accent: 0 0% 20%;
   --accent-foreground: 210 20% 98%;
-  --muted: 215 20% 15%;
-  --muted-foreground: 215 15% 80%; /* Increased brightness for skimmability */
+  --muted: 0 0% 8%;
+  --muted-foreground: 215 15% 90%; /* Higher contrast for skimmability */
 }
 
 @layer base {
   body {
-    @apply bg-[#080c14] text-[#f8fafc] antialiased;
-    background-image: radial-gradient(circle at 50% -20%, rgba(30, 41, 59, 0.3), transparent);
+    @apply bg-[#050505] text-[#f8fafc] antialiased;
+    background-image: radial-gradient(circle at 50% -20%, rgba(255, 255, 255, 0.03), transparent);
   }
 }
 
 .luxury-card {
-  @apply bg-[#111827]/60 border border-slate-800/60 backdrop-blur-md shadow-2xl;
+  @apply bg-white/[0.02] border border-white/[0.08] backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)];
+  box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .mercury-border {
-  @apply border border-slate-800/40;
+  @apply border border-white/[0.05];
 }
 
 .text-mercury-muted {
-  @apply text-slate-400 font-normal;
+  @apply text-slate-300 font-normal;
 }
 
 .italic-mercury {
-  @apply font-medium text-slate-200 tracking-tight;
-  font-size: 1.1em;
-  line-height: 1.6;
+  @apply font-medium text-white tracking-tight;
+  font-size: 1.15em;
+  line-height: 1.7;
 }
 
 .high-focus-title {
-  @apply text-white font-bold tracking-tight;
-  text-shadow: 0 0 30px rgba(255,255,255,0.05);
+  @apply text-white font-bold tracking-tighter;
+  text-shadow: 0 0 40px rgba(255,255,255,0.1);
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 1; transform: scale(1); filter: brightness(1); }
+  50% { opacity: 0.8; transform: scale(0.995); filter: brightness(1.2); }
+}
+
+.animate-breathe {
+  animation: breathe 3s ease-in-out infinite;
 }

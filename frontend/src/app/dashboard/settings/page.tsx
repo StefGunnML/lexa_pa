@@ -116,54 +116,54 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="space-y-12">
-      <header className="space-y-4">
+    <div className="space-y-16 pb-20">
+      <header className="space-y-6">
         <div className="flex items-center gap-2">
-          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">System Command</span>
+          <span className="text-[11px] font-black text-white/30 uppercase tracking-[0.4em]">System Node Architecture</span>
         </div>
-        <h2 className="text-4xl font-light tracking-tight text-slate-100">Setup & Onboarding</h2>
-        <p className="text-slate-400 text-base max-w-2xl font-light leading-relaxed">
-          Configure your private reasoning nodes, authenticate communication channels, and define the <span className="text-slate-200">strategic guardrails</span> for your AI Chief of Staff.
+        <h2 className="text-6xl font-black tracking-tighter text-white">System Command</h2>
+        <p className="text-white/40 text-lg max-w-2xl font-normal leading-relaxed">
+          Configure your private reasoning nodes, calibrate communication streams, and define the <span className="text-white">strategic principles</span> that govern your AI Chief of Staff.
         </p>
       </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
         
         {/* Step 1: Reasoning Engine */}
-        <Card className="space-y-8">
+        <Card className={`space-y-10 border-white/[0.05] ${pulseStatus === 'active' ? 'animate-breathe' : ''}`}>
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-500/10 rounded-lg text-blue-400">
-                <Zap size={20} />
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-white/10 rounded-xl text-white">
+                <Zap size={24} />
               </div>
-              <h3 className="text-xl font-medium text-white italic-mercury">Reasoning Engine</h3>
+              <h3 className="text-2xl font-bold text-white tracking-tight">Reasoning Engine</h3>
             </div>
-            <Badge variant={pulseStatus === 'active' ? 'success' : pulseStatus === 'error' ? 'warning' : 'default'}>
+            <Badge variant={pulseStatus === 'active' ? 'success' : pulseStatus === 'error' ? 'warning' : 'default'} className="px-4 py-1.5">
               {pulseStatus.toUpperCase()}
             </Badge>
           </div>
 
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Scaleway IP / Endpoint</label>
+          <div className="space-y-6">
+            <div className="space-y-3">
+              <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">Scaleway IP / Endpoint</label>
               <input 
                 type="text" 
                 value={config.DEEPSEEK_API_BASE || ''}
                 onChange={(e) => setConfig({...config, DEEPSEEK_API_BASE: e.target.value})}
                 onBlur={(e) => saveConfig('DEEPSEEK_API_BASE', e.target.value)}
                 placeholder="http://51.159.141.13:8000/v1"
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-slate-600 transition-colors"
+                className="w-full bg-black border border-white/10 rounded-xl px-5 py-4 text-sm text-white focus:outline-none focus:border-white/40 transition-all placeholder:text-white/10"
               />
             </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Secret Key</label>
+            <div className="space-y-3">
+              <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">Secret Key</label>
               <input 
                 type="password" 
                 value={config.DEEPSEEK_API_KEY || ''}
                 onChange={(e) => setConfig({...config, DEEPSEEK_API_KEY: e.target.value})}
                 onBlur={(e) => saveConfig('DEEPSEEK_API_KEY', e.target.value)}
                 placeholder="••••••••••••••••"
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-slate-600 transition-colors"
+                className="w-full bg-black border border-white/10 rounded-xl px-5 py-4 text-sm text-white focus:outline-none focus:border-white/40 transition-all placeholder:text-white/10"
               />
             </div>
           </div>
@@ -171,79 +171,83 @@ export default function SettingsPage() {
           <Button 
             onClick={testPulse} 
             disabled={pulseStatus === 'testing'}
-            className="w-full py-6 flex items-center justify-center gap-2 font-bold"
+            className="w-full py-8 flex items-center justify-center gap-3 text-sm font-black tracking-[0.2em]"
+            variant={pulseStatus === 'active' ? 'primary' : 'outline'}
           >
-            {pulseStatus === 'testing' ? <RefreshCw className="animate-spin" size={16} /> : <Play size={16} />}
-            Pulse Check (H100 Node)
+            {pulseStatus === 'testing' ? <RefreshCw className="animate-spin" size={18} /> : <Play size={18} />}
+            PULSE CHECK (H100)
           </Button>
         </Card>
 
         {/* Step 2: Communication Nodes */}
-        <Card className="space-y-8">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-emerald-500/10 rounded-lg text-emerald-400">
-              <MessageSquare size={20} />
+        <Card className="space-y-10 border-white/[0.05]">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-white/10 rounded-xl text-white">
+              <MessageSquare size={24} />
             </div>
-            <h3 className="text-xl font-medium text-white italic-mercury">Communication Nodes</h3>
+            <h3 className="text-2xl font-bold text-white tracking-tight">Communication Nodes</h3>
           </div>
 
           <div className="space-y-4">
-            <div className="p-4 bg-slate-950/50 border border-slate-800 rounded-xl flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded bg-white/5 flex items-center justify-center text-xs font-bold text-slate-400">G</div>
+            <div className="p-6 bg-white/[0.02] border border-white/[0.05] rounded-2xl flex items-center justify-between hover:bg-white/[0.04] transition-all">
+              <div className="flex items-center gap-5">
+                <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-sm font-black text-white/40 border border-white/10">G</div>
                 <div>
-                  <p className="text-sm font-medium text-slate-200">Gmail Intelligence</p>
-                  <p className="text-[10px] text-slate-500 uppercase tracking-tighter">gmail-sync</p>
+                  <p className="text-base font-bold text-white tracking-tight">Gmail Intelligence</p>
+                  <p className="text-[10px] text-white/30 uppercase tracking-widest font-black">gmail-sync</p>
                 </div>
               </div>
-              <Button size="sm" variant="outline" onClick={() => connectService('google-gmail')}>Authorize</Button>
+              <Button size="sm" variant="outline" onClick={() => connectService('google-gmail')} className="px-6">Authorize</Button>
             </div>
 
-            <div className="p-4 bg-slate-950/50 border border-slate-800 rounded-xl flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded bg-white/5 flex items-center justify-center text-xs font-bold text-slate-400">S</div>
+            <div className="p-6 bg-white/[0.02] border border-white/[0.05] rounded-2xl flex items-center justify-between hover:bg-white/[0.04] transition-all">
+              <div className="flex items-center gap-5">
+                <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-sm font-black text-white/40 border border-white/10">S</div>
                 <div>
-                  <p className="text-sm font-medium text-slate-200">Slack Stream</p>
-                  <p className="text-[10px] text-slate-500 uppercase tracking-tighter">slack-messages</p>
+                  <p className="text-base font-bold text-white tracking-tight">Slack Stream</p>
+                  <p className="text-[10px] text-white/30 uppercase tracking-widest font-black">slack-messages</p>
                 </div>
               </div>
-              <Button size="sm" variant="outline" onClick={() => connectService('slack')}>Authorize</Button>
+              <Button size="sm" variant="outline" onClick={() => connectService('slack')} className="px-6">Authorize</Button>
             </div>
           </div>
 
-          <div className="p-4 bg-amber-900/10 border border-amber-900/20 rounded-lg">
-            <p className="text-[10px] text-amber-500 leading-relaxed italic-mercury">
-              Note: One-click auth uses the Nango secure vault. Project Compass never stores your direct OAuth credentials.
+          <div className="p-6 bg-white/[0.02] border border-white/[0.05] rounded-2xl">
+            <p className="text-[11px] text-white/40 leading-relaxed font-medium">
+              Note: One-click auth uses the <span className="text-white">Nango secure vault</span>. Project Compass never stores your direct OAuth credentials.
             </p>
           </div>
         </Card>
 
         {/* Step 3: Strategic Playbook */}
-        <Card className="lg:col-span-2 space-y-6">
+        <Card className="lg:col-span-2 space-y-8 border-white/[0.05]">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-purple-500/10 rounded-lg text-purple-400">
-                <Shield size={20} />
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-white/10 rounded-xl text-white">
+                <Shield size={24} />
               </div>
-              <h3 className="text-xl font-medium text-white italic-mercury">Founder Playbook</h3>
+              <h3 className="text-2xl font-bold text-white tracking-tight">Founder Playbook</h3>
             </div>
             <Button 
               onClick={savePlaybook} 
               variant="primary" 
-              className="px-8 flex items-center gap-2"
+              className="px-10 py-4 flex items-center gap-3 text-xs"
               disabled={saving}
             >
-              <Save size={16} />
-              Save Principles
+              <Save size={18} />
+              COMMIT PRINCIPLES
             </Button>
           </div>
 
-          <textarea 
-            value={playbook}
-            onChange={(e) => setPlaybook(e.target.value)}
-            className="w-full h-64 bg-slate-950 border border-slate-800 rounded-xl p-6 text-sm text-slate-300 leading-relaxed font-mono focus:outline-none focus:border-slate-600 transition-colors"
-            placeholder="# Core Principles..."
-          />
+          <div className="relative group">
+            <div className="absolute -inset-1 bg-gradient-to-b from-white/5 to-transparent rounded-2xl blur opacity-25 group-hover:opacity-40 transition-opacity"></div>
+            <textarea 
+              value={playbook}
+              onChange={(e) => setPlaybook(e.target.value)}
+              className="relative w-full h-80 bg-black border border-white/10 rounded-2xl p-8 text-lg text-white/80 leading-relaxed font-serif focus:outline-none focus:border-white/30 transition-all placeholder:text-white/5"
+              placeholder="# Core Principles..."
+            />
+          </div>
         </Card>
 
       </div>

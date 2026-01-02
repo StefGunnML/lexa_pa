@@ -24,23 +24,23 @@ export function Button({
   className?: string
 }) {
   const styles = {
-    primary: "bg-slate-100 text-slate-900 hover:bg-white shadow-lg",
-    secondary: "bg-slate-800 text-slate-100 hover:bg-slate-700",
-    destructive: "bg-red-950/20 text-red-400 hover:bg-red-900/30 border border-red-900/30",
-    outline: "border border-slate-700 text-slate-300 hover:border-slate-500 hover:text-white"
+    primary: "bg-white text-black hover:bg-white/90 shadow-[0_0_30px_rgba(255,255,255,0.15)] border-t border-white/20",
+    secondary: "bg-white/5 text-white hover:bg-white/10 border border-white/10 shadow-inner",
+    destructive: "bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20 shadow-[0_0_20px_rgba(239,68,68,0.1)]",
+    outline: "border border-white/10 text-white/60 hover:border-white/40 hover:text-white bg-transparent"
   };
 
   const sizes = {
-    default: "px-5 py-2 text-xs",
-    sm: "px-3 py-1 text-[10px]",
-    lg: "px-8 py-3 text-sm"
+    default: "px-6 py-3 text-xs",
+    sm: "px-4 py-1.5 text-[10px]",
+    lg: "px-10 py-4 text-sm uppercase tracking-[0.2em]"
   };
   
   return (
     <button 
       onClick={onClick}
       disabled={disabled}
-      className={`rounded-xl font-bold tracking-wide transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed ${styles[variant]} ${sizes[size]} ${className}`}
+      className={`rounded-xl font-black tracking-widest transition-all duration-300 active:scale-[0.97] hover:translate-y-[-1px] disabled:opacity-30 disabled:cursor-not-allowed ${styles[variant]} ${sizes[size]} ${className}`}
     >
       {children}
     </button>
