@@ -2,6 +2,7 @@ import httpx
 import os
 from typing import List, Dict, Any
 from app.services.deepseek import DeepSeekService
+from app.services.agent import CompassAgent
 from app.models import Thread, Message
 from datetime import datetime
 
@@ -9,6 +10,7 @@ class SlackService:
     def __init__(self, db_session):
         self.nango_secret = os.getenv("NANGO_SECRET_KEY")
         self.deepseek = DeepSeekService()
+        self.agent = CompassAgent()
         self.db = db_session
 
     async def sync_slack_messages(self, connection_id: str):
@@ -37,10 +39,18 @@ class SlackService:
                 thread = Thread(id=thread_id, title=f"Slack Thread: {channel_id}")
                 self.db.add(thread)
             
-            # 4. Update Rolling Summary
-            new_summary = await self.deepseek.summarize_thread(thread.rolling_summary or {}, message_body)
-            thread.rolling_summary = new_summary
-            thread.last_updated = datetime.utcnow()
+            # 4. Trigger Agent (Summarization + Identity + Actions)
+            sender_info = {
+                "slack_id": record.get("user_id"),
+                "name": record.get("user_name")
+            }
+            
+            await self.agent.run(
+                thread_id=thread_id,
+                message=message_body,
+                current_summary=thread.rolling_summary or {},
+                sender_info=sender_info
+            )
             
             # 5. Save message
             msg = Message(

@@ -43,21 +43,36 @@ class CompassAgent:
         """
         Identity Resolution Engine:
         Scans for existing entities that might match the sender.
+        If no match found but info exists, we suggest a profile merge.
         """
         sender = state.get("sender_info", {})
         email = sender.get("email")
+        slack_id = sender.get("slack_id")
         
         db = SessionLocal()
+        # 1. Exact Email Match
         entity = db.query(Entity).filter(Entity.email == email).first()
+        if not entity and slack_id:
+            # 2. Slack ID Match
+            entity = db.query(Entity).filter(Entity.slack_id == slack_id).first()
+        
         db.close()
 
         if entity:
             return {"potential_matches": [{"id": str(entity.id), "name": entity.name}]}
         
+        # If we have name but no ID match, return a potential match by name
+        if sender.get("name"):
+            db = SessionLocal()
+            matches = db.query(Entity).filter(Entity.name.ilike(f"%{sender['name']}%")).all()
+            db.close()
+            return {"potential_matches": [{"id": str(m.id), "name": m.name} for m in matches]}
+
         return {"potential_matches": []}
 
     async def _summarize_node(self, state: AgentState):
-        summary = await self.deepseek.summarize_thread(state['current_summary'], state['new_message'])
+        # Only summarize if it's a new message or update needed
+        summary = await self.deepseek.summarize_thread(state.get('current_summary', {}), state['new_message'])
         
         # Persist to DB
         db = SessionLocal()
@@ -70,7 +85,7 @@ class CompassAgent:
         return {"current_summary": summary}
 
     async def _extract_tasks_node(self, state: AgentState):
-        tasks = state['current_summary'].get("pending_tasks", [])
+        tasks = state.get('current_summary', {}).get("pending_tasks", [])
         return {"extracted_tasks": tasks}
 
     async def _generate_actions_node(self, state: AgentState):
@@ -78,11 +93,26 @@ class CompassAgent:
         thread_id = state.get('thread_id')
         db = SessionLocal()
         
+        # 1. Merge Profile Actions (Reliability Layer)
+        if not state.get('potential_matches') and state.get('sender_info', {}).get('email'):
+            # This is a new entity, suggest creating it
+            actions.append({
+                "type": "create_profile",
+                "confidence_score": 0.9,
+                "source_link": "#",
+                "data": {
+                    "name": state['sender_info'].get('name', 'Unknown User'),
+                    "email": state['sender_info'].get('email'),
+                    "reasoning": "New contact detected in communication stream."
+                }
+            })
+
+        # 2. Task-based Actions
         for task in state['extracted_tasks']:
-            source_link = f"https://mail.google.com/mail/u/0/#all/{thread_id}" if thread_id else "#"
+            source_link = f"https://mail.google.com/mail/u/0/#all/{thread_id}" if "SLACK" not in thread_id else "#"
             confidence = task.get("confidence_score", 0.5) 
             
-            if "schedule" in task.get("description", "").lower():
+            if "schedule" in task.get("description", "").lower() or "meeting" in task.get("description", "").lower():
                 action = PendingAction(
                     type="calendar_invite",
                     confidence_score=confidence,
@@ -106,22 +136,14 @@ class CompassAgent:
         db.close()
         return {"actions": actions}
 
-    async def run(self, thread_id: str, message: str, current_summary: Dict[str, Any]):
+    async def run(self, thread_id: str, message: str, current_summary: Dict[str, Any], sender_info: Dict[str, Any] = {}):
         initial_state = {
             "thread_id": thread_id,
             "new_message": message,
+            "sender_info": sender_info,
             "current_summary": current_summary,
             "extracted_tasks": [],
-            "actions": []
-        }
-        return await self.workflow.ainvoke(initial_state)
-
-    async def run(self, thread_id: str, message: str, current_summary: Dict[str, Any]):
-        initial_state = {
-            "thread_id": thread_id,
-            "new_message": message,
-            "current_summary": current_summary,
-            "extracted_tasks": [],
+            "potential_matches": [],
             "actions": []
         }
         return await self.workflow.ainvoke(initial_state)

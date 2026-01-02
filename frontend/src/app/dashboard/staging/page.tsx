@@ -130,6 +130,17 @@ export default function StagingArea() {
                   </div>
 
                   <div className="space-y-6">
+                    {action.type === 'create_profile' && (
+                      <div className="space-y-6">
+                        <h3 className="text-3xl font-bold text-foreground tracking-tighter">New Entity: {action.data.name}</h3>
+                        <div className="flex flex-wrap gap-2">
+                          <div className="px-3 py-1 bg-muted border border-border text-[10px] font-mono font-medium text-muted-foreground uppercase">
+                            {action.data.email}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
                     {action.type === 'calendar_invite' && (
                       <div className="space-y-3">
                         <h3 className="text-3xl font-bold text-foreground tracking-tighter">{action.data.title}</h3>
