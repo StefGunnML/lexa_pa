@@ -97,6 +97,39 @@ async def update_playbook(data: PlaybookUpdate):
     db.close()
     return {"status": "saved"}
 
+@app.post("/nango/trigger-sync")
+async def trigger_nango_sync(request: Request):
+    db = SessionLocal()
+    nango_secret_entry = db.query(SystemConfig).filter(SystemConfig.key == "NANGO_SECRET_KEY").first()
+    db.close()
+    nango_secret = nango_secret_entry.value if nango_secret_entry else os.getenv("NANGO_SECRET_KEY")
+    
+    body = await request.json()
+    sync_id = body.get("sync_id", "gmail-sync")
+    
+    async with httpx.AsyncClient() as client:
+        # Get connections first to get a valid connectionId
+        conn_res = await client.get("https://api.nango.dev/connection", headers={"Authorization": f"Bearer {nango_secret}"})
+        conns = conn_res.json().get("connections", [])
+        if not conns:
+            return {"error": "No connections found"}
+        
+        cid = conns[0]["connection_id"]
+        # Trigger the sync
+        res = await client.post(
+            "https://api.nango.dev/sync/trigger",
+            headers={"Authorization": f"Bearer {nango_secret}", "Content-Type": "application/json"},
+            json={
+                "provider_config_key": "google-mail",
+                "connection_id": cid,
+                "sync_ids": [sync_id]
+            }
+        )
+        return {
+            "status": res.status_code,
+            "data": res.json() if res.status_code < 400 else res.text[:500]
+        }
+
 @app.get("/nango/debug-records")
 async def debug_nango_records():
     db = SessionLocal()
