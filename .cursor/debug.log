@@ -1,0 +1,3 @@
+{"location":"settings.tsx:86","message":"connectService called","data":{"provider":"google"},"timestamp":1767348344236,"sessionId":"debug-session","runId":"run1","hypothesisId":"A"}
+{"location":"settings.tsx:91","message":"Requesting session token","data":{"provider":"google"},"timestamp":1767348344244,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"settings.tsx:150","message":"Exception caught","data":{"error":"Unexpected token 'I', \"Internal S\"... is not valid JSON","stack":"SyntaxError: Unexpected token 'I', \"Internal S\"... is not valid JSON"},"timestamp":1767348344618,"sessionId":"debug-session","runId":"run1","hypothesisId":"K"}

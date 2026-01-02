@@ -36,25 +36,62 @@ export async function POST(request: NextRequest) {
     console.log('[API Route] Forwarding to:', `${backendUrl}/nango/session`);
     
     // Make request to backend
-    const response = await fetch(`${backendUrl}/nango/session`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-      body: JSON.stringify({ provider }),
-    });
+    let response;
+    try {
+      response = await fetch(`${backendUrl}/nango/session`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({ provider }),
+      });
+    } catch (fetchError: any) {
+      console.error('[API Route] Fetch failed:', fetchError);
+      return NextResponse.json(
+        { 
+          error: 'BACKEND_CONNECTION_FAILED', 
+          message: `Failed to connect to backend at ${backendUrl}`,
+          details: fetchError.message,
+          hint: 'Ensure BACKEND_URL is set correctly in DigitalOcean settings.'
+        },
+        { status: 502 }
+      );
+    }
+    
+    // Get the response text first to handle non-JSON errors
+    const responseText = await response.text();
     
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+      let errorDetail;
+      try {
+        errorDetail = JSON.parse(responseText);
+      } catch (e) {
+        errorDetail = responseText;
+      }
+      
       return NextResponse.json(
-        { error: 'BACKEND_ERROR', detail: errorData, statusCode: response.status },
+        { 
+          error: 'BACKEND_RETURNED_ERROR', 
+          statusCode: response.status,
+          detail: errorDetail 
+        },
         { status: response.status }
       );
     }
     
-    const data = await response.json();
-    return NextResponse.json(data);
+    try {
+      const data = JSON.parse(responseText);
+      return NextResponse.json(data);
+    } catch (parseError: any) {
+      return NextResponse.json(
+        { 
+          error: 'BACKEND_INVALID_JSON', 
+          detail: responseText.substring(0, 500) 
+        },
+        { status: 500 }
+      );
+    }
   } catch (error: any) {
     console.error('[API Route] Nango session error:', error);
     return NextResponse.json(
