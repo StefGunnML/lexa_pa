@@ -115,10 +115,15 @@ async def list_nango_integrations():
         results = {}
         for tid in test_ids:
             try:
-                # Try to create a session for each ID to see if Nango accepts it
+                # Try with Nango-Secret header as well
+                headers = {
+                    "Authorization": f"Bearer {nango_secret}", 
+                    "Nango-Secret": nango_secret,
+                    "Content-Type": "application/json"
+                }
                 resp = await client.post(
                     "https://api.nango.dev/connect/sessions",
-                    headers={"Authorization": f"Bearer {nango_secret}", "Content-Type": "application/json"},
+                    headers=headers,
                     json={
                         "end_user": {"id": "test-id"},
                         "allowed_integrations": [tid]
@@ -131,6 +136,17 @@ async def list_nango_integrations():
                     logger.info(f"[Compass] FAIL for ID: {tid} - {resp.text}")
             except Exception as e:
                 results[tid] = str(e)
+        
+        # Also try to list syncs to find integration IDs
+        try:
+            sync_resp = await client.get(
+                "https://api.nango.dev/sync",
+                headers={"Authorization": f"Bearer {nango_secret}"}
+            )
+            results["syncs_list"] = sync_resp.json()
+        except Exception as e:
+            results["syncs_error"] = str(e)
+            
         return results
 
 @app.post("/nango/session")
