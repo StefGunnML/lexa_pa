@@ -122,7 +122,7 @@ async def trigger_nango_sync(request: Request):
             json={
                 "provider_config_key": "google-mail",
                 "connection_id": cid,
-                "sync_ids": [sync_id]
+                "syncs": [sync_id]
             }
         )
         return {
