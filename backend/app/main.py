@@ -124,6 +124,11 @@ async def create_nango_session(request: Request):
     
     async with httpx.AsyncClient() as client:
         try:
+            # #region agent log
+            with open('/Users/stefangunnarsson/Dropbox/Lexa PA/lexa_pa/.cursor/debug.log', 'a') as f:
+                import json, time
+                f.write(json.dumps({"location":"main.py:128","message":"Nango request payload","data":{"provider":provider,"secret_prefix":nango_secret[:10] if nango_secret else None},"timestamp":int(time.time()*1000),"sessionId":"debug-session","runId":"run2","hypothesisId":"ID_MISMATCH"}) + "\n")
+            # #endregion
             logger.info(f"[Compass] Calling Nango API for session token (provider: {provider})")
             response = await client.post(
                 "https://api.nango.dev/connect/sessions",
@@ -137,12 +142,15 @@ async def create_nango_session(request: Request):
                         "email": "stefan@example.com",
                         "display_name": "Stefan"
                     },
-                    "allowed_integrations": [provider]  # Restrict to the requested provider
+                    "allowed_integrations": [provider]
                 }
             )
             
             data = response.json()
-            logger.info(f"[Compass] Nango API status: {response.status_code}")
+            # #region agent log
+            with open('/Users/stefangunnarsson/Dropbox/Lexa PA/lexa_pa/.cursor/debug.log', 'a') as f:
+                f.write(json.dumps({"location":"main.py:146","message":"Nango response","data":{"status":response.status_code,"body":data},"timestamp":int(time.time()*1000),"sessionId":"debug-session","runId":"run2","hypothesisId":"ID_MISMATCH"}) + "\n")
+            # #endregion
             
             if response.status_code != 200:
                 logger.error(f"[Compass] Nango API error: {data}")
