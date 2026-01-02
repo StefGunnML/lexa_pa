@@ -63,64 +63,65 @@ export default function CommunicationThreads() {
   }, []);
 
   return (
-    <div className="space-y-16 font-mono">
+    <div className="space-y-16 font-sans">
       <header className="space-y-6">
-        <div className="flex items-center gap-2">
-          <span className="text-[11px] font-bold text-[#FFB000]/40 uppercase tracking-[0.4em]">THREAD_ARCHIVE_BROWSER</span>
+        <div className="flex items-center gap-3">
+          <span className="system-label">ARCHIVE_BROWSER</span>
+          <span className="system-label">NODES: GMAIL, SLACK, WHATSAPP</span>
         </div>
-        <h2 className="text-6xl font-bold tracking-tighter text-[#FFB000] uppercase animate-flicker">Inbox</h2>
-        <p className="text-[#FFB000]/60 text-xl max-w-2xl font-medium leading-relaxed uppercase">
-          Synthesizing historical communication streams... <span className="text-[#FFB000] underline underline-offset-8">recursive_summaries</span> ready for recall.
+        <h2 className="text-6xl font-extrabold tracking-tight text-slate-900">Inbox</h2>
+        <p className="text-slate-500 text-xl max-w-2xl font-medium leading-relaxed">
+          Aggregated communication streams... <span className="text-blue-600 font-bold">recursive_summaries</span> indexed for instant strategic recall.
         </p>
       </header>
 
       {loading ? (
         <div className="flex flex-col items-center justify-center p-32 gap-6">
-          <div className="w-10 h-10 border-t-2 border-[#FFB000] animate-spin"></div>
-          <p className="text-[11px] font-bold text-[#FFB000] uppercase tracking-[0.2em]">RECALLING_THREADS</p>
+          <div className="w-10 h-10 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+          <p className="font-mono text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Recalling_Intelligence</p>
         </div>
       ) : (
-        <div className="space-y-8">
+        <div className="space-y-6">
           {threads.map(thread => (
             <Link key={thread.id} href={`/dashboard/threads/${thread.id}`} className="block group">
-              <Card className="border-[#FFB000]/20 hover:border-[#FFB000]/50 transition-all duration-300 p-10">
+              <Card className="p-10 hover:border-blue-200">
                 <div className="flex flex-col gap-8">
                   <div className="flex items-start justify-between">
                     <div className="space-y-2">
                       <div className="flex items-center gap-4">
-                        <Badge variant="default" className="font-bold border-[#FFB000]/40">{thread.source.toUpperCase()}</Badge>
-                        <h3 className="text-2xl font-bold text-[#FFB000] tracking-tighter uppercase transition-colors">
+                        <Badge variant="default" className="font-bold">{thread.source.toUpperCase()}</Badge>
+                        <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight group-hover:text-blue-600 transition-colors">
                           {thread.title}
                         </h3>
                       </div>
-                      <p className="text-[11px] text-[#FFB000]/40 uppercase tracking-widest font-bold">
+                      <p className="font-mono text-[10px] text-slate-400 uppercase tracking-widest font-black">
                         LAST_SYNC: {new Date(thread.last_updated).toLocaleString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' }).toUpperCase()}
                       </p>
                     </div>
-                    <div className="w-10 h-10 border border-[#FFB000]/20 flex items-center justify-center group-hover:bg-[#FFB000] group-hover:text-black transition-all duration-300">
-                      <span className="text-lg font-bold">→</span>
+                    <div className="w-10 h-10 border border-slate-200 rounded-full flex items-center justify-center group-hover:bg-blue-50 group-hover:border-blue-200 transition-all duration-300">
+                      <span className="text-slate-400 group-hover:text-blue-600 text-lg">→</span>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-12 pt-8 border-t border-[#FFB000]/10">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-12 pt-8 border-t border-slate-50">
                     <div className="space-y-4">
-                      <div className="flex items-center gap-3 text-[10px] font-bold text-[#FFB000]/40 uppercase tracking-widest">
+                      <div className="font-mono text-[9px] font-black text-slate-400 uppercase tracking-widest">
                         [STRATEGIC_CONTEXT]
                       </div>
-                      <p className="text-base text-[#FFB000]/80 leading-relaxed italic">
+                      <p className="text-base text-slate-600 leading-relaxed italic">
                         "{thread.rolling_summary.strategic_context}"
                       </p>
                     </div>
 
                     <div className="space-y-4">
-                      <div className="flex items-center gap-3 text-[10px] font-bold text-[#FFB000]/40 uppercase tracking-widest">
+                      <div className="font-mono text-[9px] font-black text-slate-400 uppercase tracking-widest">
                         [PENDING_TASKS]
                       </div>
                       <ul className="space-y-3">
                         {thread.rolling_summary.pending_tasks.map((task: string, i: number) => (
-                          <li key={i} className="text-sm font-medium text-[#FFB000]/60 flex items-start gap-3">
-                            <span className="w-1.5 h-1.5 bg-[#FFB000]/20 mt-1.5 shrink-0"></span>
-                            {task.toUpperCase()}
+                          <li key={i} className="text-sm font-bold text-slate-500 flex items-start gap-3">
+                            <span className="w-1.5 h-1.5 bg-blue-500/20 mt-1.5 shrink-0 rounded-full"></span>
+                            {task}
                           </li>
                         ))}
                       </ul>

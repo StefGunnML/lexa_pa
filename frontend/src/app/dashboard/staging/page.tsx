@@ -71,46 +71,49 @@ export default function StagingArea() {
   };
 
   return (
-    <div className="space-y-24 pb-20 font-mono">
-      <header className="space-y-8">
-        <div className="flex items-center gap-2">
-          <span className="text-[11px] font-black text-black uppercase tracking-[0.4em] bg-black text-white px-2 py-0.5">STATUS: READY</span>
+    <div className="space-y-20 pb-20 font-sans">
+      <header className="space-y-6">
+        <div className="flex items-center gap-3">
+          <span className="system-label">NODE_STATUS: ACTIVE</span>
+          <span className="system-label">MODE: STRATEGIC</span>
         </div>
-        <h2 className="text-7xl font-black tracking-tighter text-black uppercase">Staging Area</h2>
-        <p className="text-black/60 text-2xl max-w-2xl font-bold leading-relaxed uppercase tracking-tighter">
-          Synthesizing intelligence... Select <span className="text-black underline underline-offset-8 decoration-4">COMMAND_ACTION</span> to proceed.
+        <h2 className="text-6xl font-extrabold tracking-tight text-slate-900">Staging Area</h2>
+        <p className="text-slate-500 text-xl max-w-2xl font-medium leading-relaxed">
+          Synthesizing multi-node intelligence... Review and authorize <span className="text-blue-600 font-bold">strategic_actions</span> proposed by your Chief of Staff.
         </p>
       </header>
 
       {loading ? (
         <div className="flex flex-col items-center justify-center p-32 gap-6">
-          <div className="w-12 h-12 border-4 border-black border-t-transparent animate-spin"></div>
-          <p className="text-sm font-black text-black uppercase tracking-[0.3em]">LOADING_SYSTEM_RESOURCES</p>
+          <div className="w-10 h-10 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+          <p className="font-mono text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Recalling_Global_State</p>
         </div>
       ) : (
-        <div className="space-y-16">
+        <div className="space-y-10">
           {actions.length === 0 ? (
-            <div className="text-center p-32 border-4 border-dashed border-black">
-              <p className="text-black/40 text-xl uppercase tracking-[0.4em] font-black">SYSTEM_IDLE</p>
+            <div className="text-center p-32 border border-slate-200 bg-white/50 rounded-2xl">
+              <p className="text-slate-400 text-sm uppercase tracking-[0.2em] font-bold">System Idle</p>
             </div>
           ) : (
             actions.map(action => (
               <Card key={action.id} className="group">
-                <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-16">
-                  <div className="flex-1 space-y-12">
-                    <div className="flex flex-wrap items-center gap-10">
-                      <Badge variant={action.type === 'merge_profiles' ? 'warning' : 'default'} className="text-xs">
-                        TYPE: {action.type.toUpperCase()}
+                <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-12">
+                  <div className="flex-1 space-y-10">
+                    <div className="flex flex-wrap items-center gap-8">
+                      <Badge variant={action.type === 'merge_profiles' ? 'warning' : 'default'}>
+                        {action.type.replace('_', ' ')}
                       </Badge>
                       
-                      <div className="flex items-center gap-8">
+                      <div className="flex items-center gap-6">
                         {action.confidence_score >= 0.85 ? (
-                          <div className="flex items-center gap-3 text-black font-black text-[10px] uppercase tracking-widest border-2 border-black px-3 py-1">
-                            INTEL_VERIFIED
+                          <div className="flex items-center gap-2.5 text-emerald-600 font-bold text-[10px] uppercase tracking-widest">
+                            <div className="w-1 h-1 bg-emerald-500 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+                            Verified Intel
                           </div>
                         ) : (
-                          <div className="flex items-center gap-3 text-white bg-black font-black text-[10px] uppercase tracking-widest px-3 py-1 animate-pulse">
-                            REVIEW_REQUIRED
+                          <div className="flex items-center gap-2.5 text-amber-600 font-bold text-[10px] uppercase tracking-widest">
+                            <div className="w-1 h-1 bg-amber-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(245,158,11,0.5)]"></div>
+                            Requires Review
                           </div>
                         )}
 
@@ -119,30 +122,30 @@ export default function StagingArea() {
                             href={action.source_link} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="text-[10px] font-black text-black/40 hover:text-black transition-all uppercase tracking-widest underline decoration-2"
+                            className="text-[10px] font-bold text-slate-400 hover:text-blue-600 transition-all uppercase tracking-widest border-b border-transparent hover:border-blue-600/30 pb-0.5"
                           >
-                            [VIEW_SRC]
+                            Source Link
                           </a>
                         )}
                       </div>
                     </div>
 
-                    <div className="space-y-8">
+                    <div className="space-y-6">
                       {action.type === 'calendar_invite' && (
-                        <div className="space-y-4">
-                          <h3 className="text-5xl font-black text-black tracking-tighter uppercase">{action.data.title}</h3>
-                          <p className="text-2xl text-black/60 font-bold uppercase">
-                            EXEC_DATE: {new Date(action.data.deadline).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }).toUpperCase()}
+                        <div className="space-y-3">
+                          <h3 className="text-4xl font-extrabold text-slate-900 tracking-tight">{action.data.title}</h3>
+                          <p className="text-lg text-slate-500 font-medium">
+                            Scheduled: {new Date(action.data.deadline).toLocaleDateString(undefined, { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                           </p>
                         </div>
                       )}
 
                       {action.type === 'merge_profiles' && (
-                        <div className="space-y-8">
-                          <h3 className="text-5xl font-black text-black tracking-tighter uppercase">MATCH: {action.data.name.toUpperCase()}</h3>
-                          <div className="flex flex-wrap gap-4">
+                        <div className="space-y-6">
+                          <h3 className="text-4xl font-extrabold text-slate-900 tracking-tight">Identity Match: {action.data.name}</h3>
+                          <div className="flex flex-wrap gap-3">
                             {action.data.platforms.map((p: string, i: number) => (
-                              <div key={i} className="px-6 py-4 bg-black text-white text-sm font-black uppercase tracking-tighter">
+                              <div key={i} className="px-4 py-2 bg-slate-50 border border-slate-100 rounded-lg text-sm font-bold text-slate-600">
                                 {p}
                               </div>
                             ))}
@@ -151,37 +154,37 @@ export default function StagingArea() {
                       )}
 
                       {action.type === 'email_draft' && (
-                        <div className="space-y-10">
-                          <div className="space-y-3">
-                            <h3 className="text-5xl font-black text-black tracking-tighter uppercase">{action.data.subject.toUpperCase()}</h3>
-                            <p className="text-xl text-black/40 font-black">TO: {action.data.to}</p>
+                        <div className="space-y-8">
+                          <div className="space-y-2">
+                            <h3 className="text-4xl font-extrabold text-slate-900 tracking-tight">{action.data.subject}</h3>
+                            <p className="text-base text-slate-400 font-medium italic">To: {action.data.to}</p>
                           </div>
-                          <div className="p-12 border-4 border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] text-2xl leading-relaxed text-black font-serif italic">
+                          <div className="p-10 bg-slate-50/50 border border-slate-100 rounded-xl text-lg leading-relaxed text-slate-700 italic font-serif">
                             "{action.data.body}"
                           </div>
                         </div>
                       )}
                     </div>
 
-                    <div className="p-10 border-4 border-black bg-black text-white space-y-5">
-                      <div className="flex items-center gap-4">
-                        <span className="text-[11px] font-black uppercase tracking-[0.4em]"># STRATEGIC_LOGIC_70B</span>
+                    <div className="p-8 bg-blue-50/30 border-l-2 border-blue-200 space-y-4">
+                      <div className="flex items-center gap-3 opacity-60">
+                        <span className="font-mono text-[9px] font-black text-blue-600 uppercase tracking-[0.3em]">Strategic Logic</span>
                       </div>
-                      <p className="text-xl font-bold leading-relaxed tracking-tighter">
+                      <p className="text-base font-medium text-slate-700 leading-relaxed italic">
                         {action.data.reasoning || "Analyzing communication vectors for strategic dominance..."}
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex flex-row lg:flex-col gap-6 min-w-[220px]">
-                    <Button onClick={() => handleAction(action.id, 'approved')} variant="primary" className="flex-1 text-lg">
-                      EXECUTE
+                  <div className="flex flex-row lg:flex-col gap-4 min-w-[180px]">
+                    <Button onClick={() => handleAction(action.id, 'approved')} variant="primary" size="lg" className="flex-1">
+                      Execute
                     </Button>
-                    <Button onClick={() => {}} variant="secondary" className="flex-1 text-lg">
-                      RE-CODE
+                    <Button onClick={() => {}} variant="outline" size="lg" className="flex-1">
+                      Adjust
                     </Button>
-                    <Button onClick={() => handleAction(action.id, 'rejected')} variant="destructive" className="flex-1 text-lg">
-                      SCRAP
+                    <Button onClick={() => handleAction(action.id, 'rejected')} variant="destructive" size="lg" className="flex-1">
+                      Scrap
                     </Button>
                   </div>
                 </div>
