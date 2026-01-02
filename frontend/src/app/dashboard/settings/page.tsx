@@ -118,7 +118,7 @@ export default function SettingsPage() {
       const connect = nango.openConnectUI({
         onEvent: (event) => {
           if (event.type === 'connect') {
-            console.log(`Successfully connected to ${provider}`, event.data);
+            console.log(`Successfully connected to ${provider}`);
             // The connection is now active in Nango
           }
         },
