@@ -96,17 +96,8 @@ async def update_playbook(data: PlaybookUpdate):
 async def create_nango_session():
     """
     Creates a Nango Connect Session token.
-    Checks SystemConfig for NANGO_SECRET_KEY first.
+    Returns detailed errors for debugging.
     """
-    import json
-    log_path = "/Users/stefangunnarsson/Dropbox/Lexa PA/lexa_pa/.cursor/debug.log"
-    
-    try:
-        with open(log_path, "a") as f:
-            f.write(json.dumps({"location":"main.py:create_nango_session","message":"Request started","timestamp":int(time.time()*1000),"sessionId":"debug-session","hypothesisId":"H4"}) + "\n")
-    except:
-        pass
-
     db = SessionLocal()
     nango_secret_entry = db.query(SystemConfig).filter(SystemConfig.key == "NANGO_SECRET_KEY").first()
     db.close()
@@ -114,12 +105,11 @@ async def create_nango_session():
     nango_secret = nango_secret_entry.value if nango_secret_entry else os.getenv("NANGO_SECRET_KEY")
 
     if not nango_secret:
-        try:
-            with open(log_path, "a") as f:
-                f.write(json.dumps({"location":"main.py:create_nango_session","message":"NANGO_SECRET_KEY missing","timestamp":int(time.time()*1000),"sessionId":"debug-session","hypothesisId":"H5"}) + "\n")
-        except:
-            pass
-        return {"error": "NANGO_SECRET_KEY not configured in DB or environment.", "status_code": 500}
+        return {
+            "error": "NANGO_SECRET_KEY_MISSING",
+            "detail": "NANGO_SECRET_KEY not found in database (system_config) or environment variables.",
+            "status_code": 500
+        }
     
     async with httpx.AsyncClient() as client:
         try:
@@ -138,19 +128,20 @@ async def create_nango_session():
                 }
             )
             
-            res_data = response.json()
-            try:
-                with open(log_path, "a") as f:
-                    f.write(json.dumps({"location":"main.py:create_nango_session","message":"Nango API response","data":{"status":response.status_code, "hasToken": "token" in res_data},"timestamp":int(time.time()*1000),"sessionId":"debug-session","hypothesisId":"H6"}) + "\n")
-            except:
-                pass
-                
-            response.raise_for_status()
-            return res_data
-        except httpx.HTTPStatusError as e:
-            return {"error": f"Nango API error: {e.response.text}", "status_code": e.response.status_code}
+            data = response.json()
+            if response.status_code != 200:
+                return {
+                    "error": "NANGO_API_ERROR",
+                    "status_code": response.status_code,
+                    "detail": data
+                }
+            
+            return data
         except Exception as e:
-            return {"error": str(e)}
+            return {
+                "error": "BACKEND_EXCEPTION",
+                "detail": str(e)
+            }
 
 @app.post("/ingest/webhook")
 async def nango_webhook(request: Request, background_tasks: BackgroundTasks):

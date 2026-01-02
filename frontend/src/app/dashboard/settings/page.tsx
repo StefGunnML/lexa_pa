@@ -85,61 +85,48 @@ export default function SettingsPage() {
 
   const connectService = async (provider: string) => {
     try {
-      console.log(`[Compass] Initiating connect for ${provider}`);
-      // #region agent log
-      fetch('http://127.0.0.1:7243/ingest/b4de5701-9876-47ce-aad5-7d358d247a66',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'settings/page.tsx:connectService',message:'Initiating connect',data:{provider},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H4'})}).catch(()=>{});
-      // #endregion
-
+      console.log(`[Compass] Initiating connect for ${provider}...`);
+      
       // 1. Get a session token from our backend
-      // We use the full relative path to ensure the proxy rewrite kicks in
       const sessionRes = await fetch('/api/nango/session', { 
         method: 'POST',
         headers: { 'Accept': 'application/json' }
       });
       
-      if (!sessionRes.ok) {
-        const errorText = await sessionRes.text();
-        console.error(`[Compass] Backend session error (${sessionRes.status}):`, errorText);
-        // #region agent log
-        fetch('http://127.0.0.1:7243/ingest/b4de5701-9876-47ce-aad5-7d358d247a66',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'settings/page.tsx:connectService',message:'Backend error',data:{status: sessionRes.status, text: errorText},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H4'})}).catch(()=>{});
-        // #endregion
+      const sessionData = await sessionRes.json();
+      console.log(`[Compass] Backend Response:`, sessionData);
+
+      if (sessionData.error) {
+        alert(`Integration Error: ${sessionData.error}\nDetail: ${JSON.stringify(sessionData.detail)}`);
         return;
       }
-
-      const sessionData = await sessionRes.json();
-      console.log(`[Compass] Session data received:`, !!sessionData.token);
-      
-      // #region agent log
-      fetch('http://127.0.0.1:7243/ingest/b4de5701-9876-47ce-aad5-7d358d247a66',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'settings/page.tsx:connectService',message:'Session data received',data:{hasToken:!!sessionData.token},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2'})}).catch(()=>{});
-      // #endregion
 
       if (!sessionData.token) {
-        console.error("[Compass] No token in session data:", sessionData);
+        alert("Critical Error: No session token received from backend. Check browser console.");
+        console.error("[Compass] Missing token in payload:", sessionData);
         return;
       }
 
-      // 2. Initialize Nango without a public key (uses session token)
+      // 2. Initialize Nango
       const nango = new Nango();
       
       // 3. Open the Connect UI
       const connect = nango.openConnectUI({
         onEvent: (event) => {
-          console.log(`[Compass] Nango Event:`, event.type);
+          console.log(`[Compass] Nango Event:`, event.type, event.data);
           if (event.type === 'connect') {
-            // The connection is now active in Nango
+            alert(`Successfully connected to ${provider}!`);
           }
         },
       });
 
-      // 4. Provide the token to start the flow
-      console.log(`[Compass] Setting session token...`);
+      // 4. Provide the token
+      console.log(`[Compass] Injecting token into Nango modal...`);
       connect.setSessionToken(sessionData.token);
       
     } catch (err) {
-      console.error(`[Compass] connectService catch:`, err);
-      // #region agent log
-      fetch('http://127.0.0.1:7243/ingest/b4de5701-9876-47ce-aad5-7d358d247a66',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'settings/page.tsx:connectService',message:'Connect catch error',data:{err: String(err)},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2'})}).catch(()=>{});
-      // #endregion
+      console.error(`[Compass] Frontend Crash:`, err);
+      alert(`Frontend Error: ${String(err)}`);
     }
   };
 
@@ -149,7 +136,7 @@ export default function SettingsPage() {
         <div className="flex items-center gap-3">
           <span className="system-label">CALIBRATION: NODE_01</span>
           <span className="system-label">ENCRYPTION: AES-256</span>
-          <span className="system-label bg-red-100 text-red-600 font-bold border-red-200 uppercase">BUILD: NANGO_DEBUG_V1</span>
+          <span className="system-label bg-red-100 text-red-600 font-bold border-red-200 uppercase">BUILD: NANGO_DEBUG_V2</span>
         </div>
         <h2 className="text-5xl font-bold tracking-tighter text-foreground">System Command</h2>
         <p className="text-muted-foreground text-xl max-w-2xl font-medium leading-relaxed">
