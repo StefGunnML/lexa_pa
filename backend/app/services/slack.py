@@ -19,11 +19,25 @@ class SlackService:
         """
         # 1. Fetch data from Nango (Slack integration)
         async with httpx.AsyncClient() as client:
+            # CORRECT V2 ENDPOINT: /records?model={sync_id}&connectionId={cid}
+            url = f"https://api.nango.dev/records?model=slack-messages&connectionId={connection_id}"
             response = await client.get(
-                f"https://api.nango.dev/sync/slack-messages/records?connectionId={connection_id}",
-                headers={"Authorization": f"Bearer {self.nango_secret}"}
+                url,
+                headers={
+                    "Authorization": f"Bearer {self.nango_secret}",
+                    "Accept": "application/json"
+                }
             )
-            records = response.json().get("records", [])
+            
+            if response.status_code != 200:
+                return {"status": "error", "code": response.status_code, "text": response.text[:200]}
+                
+            try:
+                data = response.json()
+            except Exception:
+                return {"status": "error", "message": "Invalid JSON from Nango"}
+                
+            records = data.get("records", [])
 
         # 2. Process records into threads and messages
         for record in records:
