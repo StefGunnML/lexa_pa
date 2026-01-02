@@ -133,6 +133,19 @@ async def debug_nango_db():
         "config_keys": [c.key for c in configs]
     }
 
+@app.get("/nango/debug-api-docs")
+async def debug_nango_api_docs():
+    # Attempt to fetch something that might show the API version or schema
+    db = SessionLocal()
+    nango_secret_entry = db.query(SystemConfig).filter(SystemConfig.key == "NANGO_SECRET_KEY").first()
+    db.close()
+    nango_secret = nango_secret_entry.value if nango_secret_entry else os.getenv("NANGO_SECRET_KEY")
+    
+    async with httpx.AsyncClient() as client:
+        # Check environment to see if we are in v2
+        res = await client.get("https://api.nango.dev/environment", headers={"Authorization": f"Bearer {nango_secret}"})
+        return res.json()
+
 @app.get("/nango/debug-sync-list")
 async def debug_nango_sync_list():
     db = SessionLocal()
