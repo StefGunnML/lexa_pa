@@ -113,6 +113,30 @@ async def debug_nango_db():
         "config_keys": [c.key for c in configs]
     }
 
+@app.post("/nango/fix-webhook")
+async def fix_nango_webhook():
+    db = SessionLocal()
+    nango_secret_entry = db.query(SystemConfig).filter(SystemConfig.key == "NANGO_SECRET_KEY").first()
+    db.close()
+    nango_secret = nango_secret_entry.value if nango_secret_entry else os.getenv("NANGO_SECRET_KEY")
+    
+    url = "https://project-compass-os-hdke9.ondigitalocean.app/api/ingest/webhook"
+    
+    async with httpx.AsyncClient() as client:
+        # Nango API to set environment-wide webhook
+        res = await client.post(
+            "https://api.nango.dev/environment/webhooks",
+            headers={"Authorization": f"Bearer {nango_secret}", "Content-Type": "application/json"},
+            json={
+                "url": url,
+                "subscriptions": ["sync.records", "sync.error", "connection.created", "connection.deleted"]
+            }
+        )
+        return {
+            "status": res.status_code,
+            "data": res.json() if res.status_code < 400 else res.text[:500]
+        }
+
 @app.post("/nango/trigger-sync")
 async def trigger_nango_sync(request: Request):
     db = SessionLocal()
