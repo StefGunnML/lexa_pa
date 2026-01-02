@@ -199,7 +199,7 @@ export default function SettingsPage() {
         <div className="flex items-center gap-3">
           <span className="system-label">CALIBRATION: NODE_01</span>
           <span className="system-label">ENCRYPTION: AES-256</span>
-          <span className="system-label bg-red-100 text-red-600 font-bold border-red-200 uppercase">BUILD: DEBUG_V5_VISIBLE</span>
+          <span className="system-label bg-red-100 text-red-600 font-bold border-red-200 uppercase">BUILD: API_ROUTE_FIX</span>
         </div>
         <h2 className="text-5xl font-bold tracking-tighter text-foreground">System Command</h2>
         <p className="text-muted-foreground text-xl max-w-2xl font-medium leading-relaxed">
