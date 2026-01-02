@@ -116,6 +116,8 @@ async def list_nango_integrations():
                 "https://api.nango.dev/config",
                 headers={"Authorization": f"Bearer {nango_secret}"}
             )
+            raw_text = response.text
+            logger.info(f"[Compass] Nango Raw Response: {raw_text}")
             data = response.json()
             logger.info(f"[Compass] Nango Integrations: {data}")
             return data
