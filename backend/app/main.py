@@ -66,37 +66,6 @@ async def update_config(data: ConfigUpdate):
     db.close()
     return {"status": "updated"}
 
-@app.post("/config/pulse-check")
-async def pulse_check():
-    ds = DeepSeekService()
-    import time
-    start = time.time()
-    if await ds.ping():
-        latency = int((time.time() - start) * 1000)
-        return {"status": "active", "latency": f"{latency}ms"}
-    else:
-        return {"status": "inactive", "error": "Could not reach Scaleway vLLM node."}
-
-@app.get("/playbook")
-async def get_playbook():
-    db = SessionLocal()
-    playbook = db.query(Playbook).filter(Playbook.is_active == True).first()
-    db.close()
-    if not playbook:
-        return {"content": "# Project Compass Playbook\n\nNo principles defined yet."}
-    return {"content": playbook.content}
-
-@app.post("/playbook")
-async def update_playbook(data: PlaybookUpdate):
-    db = SessionLocal()
-    # Deactivate old playbooks
-    db.query(Playbook).filter(Playbook.is_active == True).update({Playbook.is_active: False})
-    new_playbook = Playbook(content=data.content, is_active=True)
-    db.add(new_playbook)
-    db.commit()
-    db.close()
-    return {"status": "saved"}
-
 @app.get("/actions")
 async def list_pending_actions():
     db = SessionLocal()
@@ -117,6 +86,33 @@ async def update_action_status(action_id: str, data: Dict[str, str]):
     db.close()
     return {"status": "updated"}
 
+@app.get("/nango/debug-all-syncs")
+async def debug_all_nango_syncs():
+    db = SessionLocal()
+    nango_secret_entry = db.query(SystemConfig).filter(SystemConfig.key == "NANGO_SECRET_KEY").first()
+    db.close()
+    nango_secret = nango_secret_entry.value if nango_secret_entry else os.getenv("NANGO_SECRET_KEY")
+    
+    endpoints = [
+        "https://api.nango.dev/sync/configurations",
+        "https://api.nango.dev/sync-configs",
+        "https://api.nango.dev/sync/status",
+        "https://api.nango.dev/sync/definitions"
+    ]
+    
+    results = {}
+    async with httpx.AsyncClient() as client:
+        for url in endpoints:
+            try:
+                res = await client.get(url, headers={"Authorization": f"Bearer {nango_secret}", "Accept": "application/json"})
+                results[url] = {
+                    "status": res.status_code,
+                    "data": res.json() if res.status_code == 200 else res.text[:200]
+                }
+            except Exception as e:
+                results[url] = str(e)
+    return results
+
 @app.post("/nango/manual-sync")
 async def manual_nango_sync():
     from app.services.gmail import GmailService
@@ -131,7 +127,6 @@ async def manual_nango_sync():
         return {"error": "NANGO_SECRET_KEY_MISSING"}
 
     async with httpx.AsyncClient() as client:
-        # Try to get connections
         conn_res = await client.get("https://api.nango.dev/connection", headers={"Authorization": f"Bearer {nango_secret}"})
         conns = conn_res.json().get("connections", [])
         
@@ -202,20 +197,6 @@ async def nango_webhook(request: Request, background_tasks: BackgroundTasks):
     background_tasks.add_task(process_ingestion, str(audit_entry.id))
     return {"status": "audited", "id": str(audit_entry.id)}
 
-from fastapi.responses import StreamingResponse
-
-@app.post("/meeting/positioning")
-async def get_positioning(data: MeetingText):
-    ds = DeepSeekService()
-    advice = "Tip: Pivot to ROI. Remind them of the 2025 premium agreement if they push for a 20% discount."
-    async def event_generator():
-        for token in advice.split(" "):
-            yield f"data: {token} \n\n"
-            await asyncio.sleep(0.05)
-        yield "data: [DONE]\n\n"
-    return StreamingResponse(event_generator(), media_type="text/event-stream")
-
-# Re-adding missing diagnostic endpoints
 @app.get("/nango/debug-db")
 async def debug_nango_db():
     db = SessionLocal()
