@@ -152,7 +152,7 @@ async def create_nango_session(request: Request):
             data = response.json()
             # #region agent log
             with open(log_path, "a") as f:
-                f.write(json.dumps({"location":"main.py:135","message":"Nango API response","data":{"statusCode":response.status_code,"hasToken":"token" in data},"timestamp":int(time.time()*1000),"sessionId":"debug-session","runId":"run1","hypothesisId":"O"})+"\n")
+                f.write(json.dumps({"location":"main.py:152","message":"Nango API response","data":{"statusCode":response.status_code,"responseKeys":list(data.keys()) if isinstance(data, dict) else "not_dict","hasToken":"token" in data if isinstance(data, dict) else False,"hasSessionToken":"sessionToken" in data if isinstance(data, dict) else False,"fullResponse":str(data)[:500]},"timestamp":int(time.time()*1000),"sessionId":"debug-session","runId":"run1","hypothesisId":"O"})+"\n")
             # #endregion
             if response.status_code != 200:
                 # #region agent log

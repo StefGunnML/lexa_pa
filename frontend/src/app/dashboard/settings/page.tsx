@@ -108,6 +108,9 @@ export default function SettingsPage() {
       fetch('http://127.0.0.1:7243/ingest/b4de5701-9876-47ce-aad5-7d358d247a66',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'settings.tsx:100',message:'Backend response received',data:{hasToken:!!sessionData.token,hasError:!!sessionData.error,error:sessionData.error,tokenLength:sessionData.token?.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
       // #endregion
       console.log(`[Compass] Backend Response:`, sessionData);
+      
+      // VISIBLE DEBUG: Show actual response structure
+      alert(`DEBUG: Backend Response\nKeys: ${Object.keys(sessionData).join(', ')}\nHas token: ${!!sessionData.token}\nHas sessionToken: ${!!sessionData.sessionToken}\nFull: ${JSON.stringify(sessionData).substring(0, 200)}`);
 
       if (sessionData.error) {
         // #region agent log
@@ -117,20 +120,23 @@ export default function SettingsPage() {
         return;
       }
 
-      if (!sessionData.token) {
+      // Try both 'token' and 'sessionToken' field names
+      const sessionToken = sessionData.token || sessionData.sessionToken;
+      
+      if (!sessionToken) {
         // #region agent log
         fetch('http://127.0.0.1:7243/ingest/b4de5701-9876-47ce-aad5-7d358d247a66',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'settings.tsx:108',message:'No token in response',data:{sessionData},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
         // #endregion
-        alert("Critical Error: No session token received from backend. Check browser console.");
+        alert(`Critical Error: No session token found.\nResponse keys: ${Object.keys(sessionData).join(', ')}\nFull response: ${JSON.stringify(sessionData)}`);
         console.error("[Compass] Missing token in payload:", sessionData);
         return;
       }
 
-      console.log(`[Compass] Token received (length: ${sessionData.token.length})`);
+      console.log(`[Compass] Token received (length: ${sessionToken.length})`);
 
       // 2. Initialize Nango
       // #region agent log
-      fetch('http://127.0.0.1:7243/ingest/b4de5701-9876-47ce-aad5-7d358d247a66',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'settings.tsx:115',message:'Initializing Nango SDK',data:{tokenLength:sessionData.token.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'})}).catch(()=>{});
+      fetch('http://127.0.0.1:7243/ingest/b4de5701-9876-47ce-aad5-7d358d247a66',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'settings.tsx:115',message:'Initializing Nango SDK',data:{tokenLength:sessionToken.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'})}).catch(()=>{});
       // #endregion
       const nango = new Nango();
       
@@ -157,10 +163,12 @@ export default function SettingsPage() {
 
       // 4. Provide the token (this tells Nango which provider to show based on allowed_integrations)
       // #region agent log
-      fetch('http://127.0.0.1:7243/ingest/b4de5701-9876-47ce-aad5-7d358d247a66',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'settings.tsx:135',message:'Setting session token',data:{provider,tokenPrefix:sessionData.token.substring(0,10)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'I'})}).catch(()=>{});
+      fetch('http://127.0.0.1:7243/ingest/b4de5701-9876-47ce-aad5-7d358d247a66',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'settings.tsx:135',message:'Setting session token',data:{provider,tokenPrefix:sessionToken.substring(0,10)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'I'})}).catch(()=>{});
       // #endregion
-      console.log(`[Compass] Setting session token (provider: ${provider})...`);
-      connect.setSessionToken(sessionData.token);
+      console.log(`[Compass] Setting session token (provider: ${provider}, token length: ${sessionToken.length})...`);
+      alert(`DEBUG: About to set token\nToken prefix: ${sessionToken.substring(0, 20)}...\nProvider: ${provider}`);
+      connect.setSessionToken(sessionToken);
+      alert(`DEBUG: Token set. Modal should load now.`);
       
       // 5. Timeout check - if modal stays grey for 10 seconds, something is wrong
       setTimeout(() => {
@@ -191,7 +199,7 @@ export default function SettingsPage() {
         <div className="flex items-center gap-3">
           <span className="system-label">CALIBRATION: NODE_01</span>
           <span className="system-label">ENCRYPTION: AES-256</span>
-          <span className="system-label bg-red-100 text-red-600 font-bold border-red-200 uppercase">BUILD: DEBUG_V4</span>
+          <span className="system-label bg-red-100 text-red-600 font-bold border-red-200 uppercase">BUILD: DEBUG_V5_VISIBLE</span>
         </div>
         <h2 className="text-5xl font-bold tracking-tighter text-foreground">System Command</h2>
         <p className="text-muted-foreground text-xl max-w-2xl font-medium leading-relaxed">
