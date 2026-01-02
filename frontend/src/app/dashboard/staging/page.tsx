@@ -96,6 +96,7 @@ export default function StagingArea() {
         <div className="flex items-center gap-3">
           <span className="system-label">NODE: ACTIVE</span>
           <span className="system-label">CONTEXT: STRATEGIC</span>
+          <span className="system-label text-red-500 font-bold">BUILD: 7949b38</span>
         </div>
         <h2 className="text-5xl font-bold tracking-tighter text-foreground">Staging Area</h2>
         <p className="text-muted-foreground text-xl max-w-2xl font-medium leading-relaxed">
