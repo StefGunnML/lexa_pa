@@ -85,10 +85,18 @@ export default function SettingsPage() {
 
   const connectService = async (provider: string) => {
     try {
+      // #region agent log
+      fetch('http://127.0.0.1:7243/ingest/b4de5701-9876-47ce-aad5-7d358d247a66',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'settings/page.tsx:connectService',message:'Initiating connect',data:{provider},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1'})}).catch(()=>{});
+      // #endregion
+
       // 1. Get a session token from our backend
       const sessionRes = await fetch('/api/nango/session', { method: 'POST' });
       const sessionData = await sessionRes.json();
       
+      // #region agent log
+      fetch('http://127.0.0.1:7243/ingest/b4de5701-9876-47ce-aad5-7d358d247a66',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'settings/page.tsx:connectService',message:'Session response received',data:{hasToken:!!sessionData.token, error: sessionData.error},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2'})}).catch(()=>{});
+      // #endregion
+
       if (sessionData.error) {
         console.error("Failed to get Nango session", sessionData.error);
         return;
@@ -110,6 +118,9 @@ export default function SettingsPage() {
       connect.setSessionToken(sessionData.token);
       
     } catch (err) {
+      // #region agent log
+      fetch('http://127.0.0.1:7243/ingest/b4de5701-9876-47ce-aad5-7d358d247a66',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'settings/page.tsx:connectService',message:'Connect catch error',data:{err: String(err)},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2'})}).catch(()=>{});
+      // #endregion
       console.error(`Failed to connect to ${provider}`, err);
     }
   };
@@ -120,6 +131,7 @@ export default function SettingsPage() {
         <div className="flex items-center gap-3">
           <span className="system-label">CALIBRATION: NODE_01</span>
           <span className="system-label">ENCRYPTION: AES-256</span>
+          <span className="system-label bg-red-100 text-red-600 font-bold border-red-200">BUILD: c8e0f23</span>
         </div>
         <h2 className="text-5xl font-bold tracking-tighter text-foreground">System Command</h2>
         <p className="text-muted-foreground text-xl max-w-2xl font-medium leading-relaxed">

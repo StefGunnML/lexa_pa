@@ -98,6 +98,12 @@ async def create_nango_session():
     Creates a Nango Connect Session token.
     Checks SystemConfig for NANGO_SECRET_KEY first.
     """
+    # #region agent log
+    with open("/Users/stefangunnarsson/Dropbox/Lexa PA/lexa_pa/.cursor/debug.log", "a") as f:
+        import json
+        f.write(json.dumps({"location":"main.py:create_nango_session","message":"Session request received","timestamp":int(time.time()*1000),"sessionId":"debug-session","hypothesisId":"H2"}) + "\n")
+    # #endregion
+
     db = SessionLocal()
     nango_secret_entry = db.query(SystemConfig).filter(SystemConfig.key == "NANGO_SECRET_KEY").first()
     db.close()
@@ -105,6 +111,10 @@ async def create_nango_session():
     nango_secret = nango_secret_entry.value if nango_secret_entry else os.getenv("NANGO_SECRET_KEY")
 
     if not nango_secret:
+        # #region agent log
+        with open("/Users/stefangunnarsson/Dropbox/Lexa PA/lexa_pa/.cursor/debug.log", "a") as f:
+            f.write(json.dumps({"location":"main.py:create_nango_session","message":"NANGO_SECRET_KEY missing","timestamp":int(time.time()*1000),"sessionId":"debug-session","hypothesisId":"H3"}) + "\n")
+        # #endregion
         return {"error": "NANGO_SECRET_KEY not configured in DB or environment.", "status_code": 500}
     
     async with httpx.AsyncClient() as client:
@@ -123,6 +133,10 @@ async def create_nango_session():
                     }
                 }
             )
+            # #region agent log
+            with open("/Users/stefangunnarsson/Dropbox/Lexa PA/lexa_pa/.cursor/debug.log", "a") as f:
+                f.write(json.dumps({"location":"main.py:create_nango_session","message":"Nango API response","data":{"status":response.status_code},"timestamp":int(time.time()*1000),"sessionId":"debug-session","hypothesisId":"H3"}) + "\n")
+            # #endregion
             response.raise_for_status()
             return response.json()
         except httpx.HTTPStatusError as e:
