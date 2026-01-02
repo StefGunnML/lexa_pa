@@ -2,9 +2,34 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect } from 'react';
 
 export function Sidebar() {
   const pathname = usePathname();
+
+  console.log('SIDEBAR_RENDER', { pathname, navItemsCount: 4 });
+
+  // #region agent log
+  useEffect(() => {
+    fetch('http://127.0.0.1:7243/ingest/b4de5701-9876-47ce-aad5-7d358d247a66', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        location: 'Sidebar.tsx:useEffect',
+        message: 'Sidebar mounted',
+        data: { pathname, navItems: [
+          { name: 'Staging', href: '/dashboard/staging' },
+          { name: 'Inbox', href: '/dashboard/threads' },
+          { name: 'Session', href: '/dashboard/meetings' },
+          { name: 'Setup', href: '/dashboard/settings' },
+        ]},
+        timestamp: Date.now(),
+        sessionId: 'debug-session',
+        hypothesisId: '1'
+      })
+    }).catch(() => {});
+  }, [pathname]);
+  // #endregion
 
   const navItems = [
     { name: 'Staging', href: '/dashboard/staging' },
