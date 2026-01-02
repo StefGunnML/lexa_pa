@@ -106,7 +106,8 @@ export default function SettingsPage() {
       // #endregion
 
       if (sessionData.error) {
-        alert(`Integration Error: ${sessionData.error}\nDetail: ${JSON.stringify(sessionData.detail)}`);
+        console.error(`[Compass] Session Error:`, sessionData);
+        alert(`Integration Error: ${sessionData.error}\nMessage: ${sessionData.detail?.error?.message || JSON.stringify(sessionData.detail)}`);
         return;
       }
 

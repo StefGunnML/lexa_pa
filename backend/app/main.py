@@ -137,15 +137,21 @@ async def list_nango_integrations():
             except Exception as e:
                 results[tid] = str(e)
         
-        # Also try to list syncs to find integration IDs
         try:
-            sync_resp = await client.get(
-                "https://api.nango.dev/sync",
-                headers={"Authorization": f"Bearer {nango_secret}"}
+            response = await client.get(
+                "https://api.nango.dev/config",
+                headers={
+                    "Authorization": f"Bearer {nango_secret}",
+                    "Accept": "application/json"
+                }
             )
-            results["syncs_list"] = sync_resp.json()
+            raw_text = response.text
+            logger.info(f"[Compass] Nango Raw Response (with Accept header): {raw_text}")
+            data = response.json()
+            results["actual_integrations"] = [item.get("unique_key") for item in data.get("configs", [])]
         except Exception as e:
-            results["syncs_error"] = str(e)
+            results["list_error"] = str(e)
+            results["raw_text_preview"] = raw_text[:200] if 'raw_text' in locals() else None
             
         return results
 
