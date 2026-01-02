@@ -94,14 +94,22 @@ export default function SettingsPage() {
       // #region agent log
       fetch('http://127.0.0.1:7243/ingest/b4de5701-9876-47ce-aad5-7d358d247a66',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'settings.tsx:91',message:'Requesting session token',data:{provider},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
       // #endregion
+      
+      // Ensure body is properly formatted
+      const requestBody = JSON.stringify({ provider });
+      console.log(`[Compass] Sending request body:`, requestBody);
+      
       const sessionRes = await fetch('/api/nango/session', { 
         method: 'POST',
         headers: { 
           'Accept': 'application/json',
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ provider })
+        body: requestBody,
+        credentials: 'same-origin', // Ensure cookies/credentials are sent
       });
+      
+      console.log(`[Compass] Response status:`, sessionRes.status);
       
       const sessionData = await sessionRes.json();
       // #region agent log
@@ -199,7 +207,7 @@ export default function SettingsPage() {
         <div className="flex items-center gap-3">
           <span className="system-label">CALIBRATION: NODE_01</span>
           <span className="system-label">ENCRYPTION: AES-256</span>
-          <span className="system-label bg-red-100 text-red-600 font-bold border-red-200 uppercase">BUILD: API_ROUTE_FIX</span>
+          <span className="system-label bg-red-100 text-red-600 font-bold border-red-200 uppercase">BUILD: REWRITE_FIX</span>
         </div>
         <h2 className="text-5xl font-bold tracking-tighter text-foreground">System Command</h2>
         <p className="text-muted-foreground text-xl max-w-2xl font-medium leading-relaxed">

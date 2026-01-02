@@ -1,24 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
+  // Log that the route was hit
+  console.log('[API Route] /api/nango/session POST received');
+  
   try {
+    // Check if body exists
+    const bodyText = await request.text();
+    console.log('[API Route] Raw body:', bodyText);
+    
     // Parse request body
     let body;
     try {
-      body = await request.json();
+      body = bodyText ? JSON.parse(bodyText) : {};
     } catch (e) {
+      console.error('[API Route] JSON parse error:', e);
       return NextResponse.json(
-        { error: 'INVALID_BODY', detail: 'Request body is not valid JSON' },
+        { error: 'INVALID_BODY', detail: `Request body is not valid JSON: ${e.message}`, rawBody: bodyText.substring(0, 100) },
         { status: 400 }
       );
     }
     
     const provider = body.provider || 'google-gmail';
+    console.log('[API Route] Provider:', provider);
     
-    // Get backend URL - in production, backend should be on same domain or configured via env
-    // For DigitalOcean, if backend is separate service, use env var
-    // Otherwise, try to use the rewrite destination
-    const backendUrl = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
+    // Get backend URL - in production, backend should be configured via env
+    // For DigitalOcean App Platform, if backend is on same app, use internal service URL
+    // If separate, use full public URL
+    const backendUrl = process.env.BACKEND_URL || 
+                      process.env.NEXT_PUBLIC_API_URL || 
+                      'http://127.0.0.1:8000';
+    
+    console.log('[API Route] Backend URL:', backendUrl);
+    console.log('[API Route] Forwarding to:', `${backendUrl}/nango/session`);
     
     // Make request to backend
     const response = await fetch(`${backendUrl}/nango/session`, {
