@@ -1,12 +1,12 @@
 from fastapi import FastAPI, BackgroundTasks, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 import uvicorn
 import httpx
 from app.services.deepseek import DeepSeekService
 from app.services.ingestion import process_ingestion
-from app.models import get_db_engine, IngestionAuditLog, init_db, SessionLocal, SystemConfig, Playbook
+from app.models import get_db_engine, IngestionAuditLog, init_db, SessionLocal, SystemConfig, Playbook, PendingAction
 from sqlalchemy.orm import sessionmaker
 import asyncio
 import os
@@ -97,6 +97,26 @@ async def update_playbook(data: PlaybookUpdate):
     db.close()
     return {"status": "saved"}
 
+@app.get("/actions")
+async def list_pending_actions():
+    db = SessionLocal()
+    actions = db.query(PendingAction).filter(PendingAction.status == 'pending').order_by(PendingAction.created_at.desc()).all()
+    db.close()
+    return actions
+
+@app.post("/actions/{action_id}")
+async def update_action_status(action_id: str, data: Dict[str, str]):
+    db = SessionLocal()
+    action = db.query(PendingAction).filter(PendingAction.id == action_id).first()
+    if not action:
+        db.close()
+        raise HTTPException(status_code=404, detail="Action not found")
+    
+    action.status = data.get("status", "pending")
+    db.commit()
+    db.close()
+    return {"status": "updated"}
+
 @app.get("/nango/debug-db")
 async def debug_nango_db():
     db = SessionLocal()
@@ -105,7 +125,7 @@ async def debug_nango_db():
     db.close()
     return {
         "recent_audit_logs": [{
-            "id": l.id,
+            "id": str(l.id),
             "platform": l.source_platform,
             "status": l.status,
             "created": l.created_at
@@ -113,62 +133,16 @@ async def debug_nango_db():
         "config_keys": [c.key for c in configs]
     }
 
-@app.post("/nango/fix-webhook")
-async def fix_nango_webhook():
+@app.get("/nango/debug-connections")
+async def debug_nango_connections():
     db = SessionLocal()
     nango_secret_entry = db.query(SystemConfig).filter(SystemConfig.key == "NANGO_SECRET_KEY").first()
     db.close()
     nango_secret = nango_secret_entry.value if nango_secret_entry else os.getenv("NANGO_SECRET_KEY")
     
-    url = "https://project-compass-os-hdke9.ondigitalocean.app/api/ingest/webhook"
-    
     async with httpx.AsyncClient() as client:
-        # Nango API to set environment-wide webhook
-        res = await client.post(
-            "https://api.nango.dev/environment/webhooks",
-            headers={"Authorization": f"Bearer {nango_secret}", "Content-Type": "application/json"},
-            json={
-                "url": url,
-                "subscriptions": ["sync.records", "sync.error", "connection.created", "connection.deleted"]
-            }
-        )
-        return {
-            "status": res.status_code,
-            "data": res.json() if res.status_code < 400 else res.text[:500]
-        }
-
-@app.post("/nango/trigger-sync")
-async def trigger_nango_sync(request: Request):
-    db = SessionLocal()
-    nango_secret_entry = db.query(SystemConfig).filter(SystemConfig.key == "NANGO_SECRET_KEY").first()
-    db.close()
-    nango_secret = nango_secret_entry.value if nango_secret_entry else os.getenv("NANGO_SECRET_KEY")
-    
-    body = await request.json()
-    sync_id = body.get("sync_id", "gmail-sync")
-    
-    async with httpx.AsyncClient() as client:
-        # Get connections first to get a valid connectionId
-        conn_res = await client.get("https://api.nango.dev/connection", headers={"Authorization": f"Bearer {nango_secret}"})
-        conns = conn_res.json().get("connections", [])
-        if not conns:
-            return {"error": "No connections found"}
-        
-        cid = conns[0]["connection_id"]
-        # Trigger the sync
-        res = await client.post(
-            "https://api.nango.dev/sync/trigger",
-            headers={"Authorization": f"Bearer {nango_secret}", "Content-Type": "application/json"},
-            json={
-                "provider_config_key": "google-mail",
-                "connection_id": cid,
-                "syncs": [sync_id]
-            }
-        )
-        return {
-            "status": res.status_code,
-            "data": res.json() if res.status_code < 400 else res.text[:500]
-        }
+        res = await client.get("https://api.nango.dev/connection", headers={"Authorization": f"Bearer {nango_secret}"})
+        return res.json()
 
 @app.get("/nango/debug-records")
 async def debug_nango_records():
@@ -178,14 +152,12 @@ async def debug_nango_records():
     nango_secret = nango_secret_entry.value if nango_secret_entry else os.getenv("NANGO_SECRET_KEY")
     
     async with httpx.AsyncClient() as client:
-        # Get connections first to get a valid connectionId
         conn_res = await client.get("https://api.nango.dev/connection", headers={"Authorization": f"Bearer {nango_secret}"})
         conns = conn_res.json().get("connections", [])
         if not conns:
             return {"error": "No connections found"}
         
         cid = conns[0]["connection_id"]
-        # Try to fetch records for common sync IDs
         sync_ids = ["gmail-sync", "slack-messages"]
         results = {}
         for sid in sync_ids:
@@ -196,60 +168,44 @@ async def debug_nango_records():
             }
         return results
 
-@app.get("/nango/debug-syncs")
-async def debug_nango_syncs():
+@app.post("/nango/manual-sync")
+async def manual_nango_sync():
+    from app.services.gmail import GmailService
+    from app.services.slack import SlackService
+    
     db = SessionLocal()
     nango_secret_entry = db.query(SystemConfig).filter(SystemConfig.key == "NANGO_SECRET_KEY").first()
-    db.close()
     nango_secret = nango_secret_entry.value if nango_secret_entry else os.getenv("NANGO_SECRET_KEY")
     
-    async with httpx.AsyncClient() as client:
-        # Check all defined syncs
-        res = await client.get("https://api.nango.dev/sync", headers={"Authorization": f"Bearer {nango_secret}", "Accept": "application/json"})
-        try:
-            return res.json()
-        except:
-            return {"status": res.status_code, "text": res.text[:500]}
+    if not nango_secret:
+        db.close()
+        return {"error": "NANGO_SECRET_KEY_MISSING"}
 
-@app.get("/nango/debug-connections")
-async def debug_nango_connections():
-    db = SessionLocal()
-    nango_secret_entry = db.query(SystemConfig).filter(SystemConfig.key == "NANGO_SECRET_KEY").first()
-    db.close()
-    nango_secret = nango_secret_entry.value if nango_secret_entry else os.getenv("NANGO_SECRET_KEY")
-    
     async with httpx.AsyncClient() as client:
-        # Check all established connections
-        res = await client.get("https://api.nango.dev/connection", headers={"Authorization": f"Bearer {nango_secret}"})
-        return res.json()
-
-@app.get("/nango/debug-config")
-async def debug_nango_config():
-    db = SessionLocal()
-    nango_secret_entry = db.query(SystemConfig).filter(SystemConfig.key == "NANGO_SECRET_KEY").first()
-    db.close()
-    nango_secret = nango_secret_entry.value if nango_secret_entry else os.getenv("NANGO_SECRET_KEY")
-    
-    async with httpx.AsyncClient() as client:
-        # Check integrations
-        int_res = await client.get("https://api.nango.dev/integrations", headers={"Authorization": f"Bearer {nango_secret}"})
-        # Check specific google-mail setup
-        detail_res = await client.get("https://api.nango.dev/integrations/google-mail", headers={"Authorization": f"Bearer {nango_secret}"})
-        return {
-            "integrations": int_res.json(),
-            "google_mail_detail": detail_res.json()
-        }
+        conn_res = await client.get("https://api.nango.dev/connection", headers={"Authorization": f"Bearer {nango_secret}"})
+        conns = conn_res.json().get("connections", [])
+        
+        results = []
+        for conn in conns:
+            cid = conn["connection_id"]
+            platform = conn["provider_config_key"]
+            
+            if "google-mail" in platform:
+                service = GmailService(db)
+                res = await service.sync_gmail_threads(cid)
+                results.append({"platform": platform, "result": res})
+            elif "slack" in platform:
+                service = SlackService(db)
+                res = await service.sync_slack_messages(cid)
+                results.append({"platform": platform, "result": res})
+        
+        db.close()
+        return {"status": "manual_sync_completed", "details": results}
 
 @app.post("/nango/session")
 async def create_nango_session(request: Request):
-    """
-    Creates a Nango Connect Session token.
-    Accepts 'provider' in request body to specify which integration to allow.
-    """
     body = await request.json()
-    provider = body.get("provider", "google-gmail")  # Default to Gmail
-    
-    logger.info(f"[Compass] Nango session request received for provider: {provider}")
+    provider = body.get("provider", "google-mail")
     
     db = SessionLocal()
     nango_secret_entry = db.query(SystemConfig).filter(SystemConfig.key == "NANGO_SECRET_KEY").first()
@@ -258,63 +214,28 @@ async def create_nango_session(request: Request):
     nango_secret = nango_secret_entry.value if nango_secret_entry else os.getenv("NANGO_SECRET_KEY")
 
     if not nango_secret:
-        logger.error("[Compass] NANGO_SECRET_KEY missing from DB and env")
-        return {
-            "error": "NANGO_SECRET_KEY_MISSING",
-            "detail": "NANGO_SECRET_KEY not found in database (system_config) or environment variables.",
-            "status_code": 500
-        }
+        return {"error": "NANGO_SECRET_KEY_MISSING", "status_code": 500}
     
     async with httpx.AsyncClient() as client:
         try:
-            logger.info(f"[Compass] Calling Nango API for session token (provider: {provider})")
             response = await client.post(
                 "https://api.nango.dev/connect/sessions",
-                headers={
-                    "Authorization": f"Bearer {nango_secret}",
-                    "Content-Type": "application/json"
-                },
+                headers={"Authorization": f"Bearer {nango_secret}", "Content-Type": "application/json"},
                 json={
-                    "end_user": {
-                        "id": "stefan-primary",
-                        "email": "stefan@example.com",
-                        "display_name": "Stefan"
-                    },
+                    "end_user": {"id": "stefan-primary", "email": "stefan@example.com", "display_name": "Stefan"},
                     "allowed_integrations": [provider]
                 }
             )
-            
             data = response.json()
-            logger.info(f"[Compass] Nango API status: {response.status_code}")
-            
             if response.status_code not in [200, 201]:
-                logger.error(f"[Compass] Nango API error: {data}")
-                return {
-                    "error": "NANGO_API_ERROR",
-                    "status_code": response.status_code,
-                    "detail": data
-                }
-            
-            # Nango returns session token inside 'data' object for 201 Created
-            session_data = data.get("data", data)
-            logger.info(f"[Compass] Session token created successfully (token: {session_data.get('token')[:15]}...)")
-            return session_data
+                return {"error": "NANGO_API_ERROR", "status_code": response.status_code, "detail": data}
+            return data.get("data", data)
         except Exception as e:
-            logger.exception(f"[Compass] Backend exception during Nango session creation: {e}")
-            return {
-                "error": "BACKEND_EXCEPTION",
-                "detail": str(e)
-            }
+            return {"error": "BACKEND_EXCEPTION", "detail": str(e)}
 
 @app.post("/ingest/webhook")
 async def nango_webhook(request: Request, background_tasks: BackgroundTasks):
-    """
-    Endpoint for Nango webhooks. 
-    Implements the Reliability Layer by auditing every event.
-    """
     payload = await request.json()
-    
-    # Audit Log Entry
     db = SessionLocal()
     audit_entry = IngestionAuditLog(
         source_uuid=str(payload.get("connectionId", uuid.uuid4())),
@@ -326,43 +247,20 @@ async def nango_webhook(request: Request, background_tasks: BackgroundTasks):
     db.commit()
     db.refresh(audit_entry)
     db.close()
-
-    # Process in background
     background_tasks.add_task(process_ingestion, str(audit_entry.id))
-    
     return {"status": "audited", "id": str(audit_entry.id)}
 
 from fastapi.responses import StreamingResponse
-import asyncio
 
 @app.post("/meeting/positioning")
 async def get_positioning(data: MeetingText):
-    """
-    Strategic Positioning Advice with Playbook Injection & SSE Streaming.
-    """
     ds = DeepSeekService()
-    
-    # Load Founder Playbook
-    playbook_content = ""
-    if os.path.exists("playbook.md"):
-        with open("playbook.md", "r") as f:
-            playbook_content = f.read()
-
+    advice = "Tip: Pivot to ROI. Remind them of the 2025 premium agreement if they push for a 20% discount."
     async def event_generator():
-        # Simulated conflict detection
-        advice = "Tip: Pivot to ROI. Remind them of the 2025 premium agreement if they push for a 20% discount."
-        
-        # Check for playbook conflict (Example: 20% discount vs 10% limit)
-        is_conflict = "20%" in data.text and "discount" in data.text.lower()
-        if is_conflict:
-            yield "data: [CONFLICT] \n\n"
-            advice = "WARNING: 20% discount requested! Playbook limit is 10%. Refuse and pivot to ROI."
-
         for token in advice.split(" "):
             yield f"data: {token} \n\n"
             await asyncio.sleep(0.05)
         yield "data: [DONE]\n\n"
-
     return StreamingResponse(event_generator(), media_type="text/event-stream")
 
 if __name__ == "__main__":
