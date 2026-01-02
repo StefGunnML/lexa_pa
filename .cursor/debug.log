@@ -1,0 +1,2 @@
+{"location":"settings.tsx:86","message":"connectService called","data":{"provider":"gmail-sync"},"timestamp":1767351687153,"sessionId":"debug-session","runId":"run2","hypothesisId":"ID_MISMATCH"}
+{"location":"settings.tsx:100","message":"Backend response for session","data":{"error":"BACKEND_EXCEPTION","detail":"[Errno 2] No such file or directory: '/Users/stefangunnarsson/Dropbox/Lexa PA/lexa_pa/.cursor/debug.log'"},"timestamp":1767351687508,"sessionId":"debug-session","runId":"run2","hypothesisId":"ID_MISMATCH"}
