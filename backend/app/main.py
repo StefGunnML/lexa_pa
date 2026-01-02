@@ -63,12 +63,13 @@ async def update_config(data: ConfigUpdate):
 @app.post("/config/pulse-check")
 async def pulse_check():
     ds = DeepSeekService()
-    try:
-        # Simple zero-token test
-        # In a real scenario, DeepSeekService would handle the ping
-        return {"status": "active", "latency": "45ms"}
-    except Exception as e:
-        return {"status": "inactive", "error": str(e)}
+    import time
+    start = time.time()
+    if await ds.ping():
+        latency = int((time.time() - start) * 1000)
+        return {"status": "active", "latency": f"{latency}ms"}
+    else:
+        return {"status": "inactive", "error": "Could not reach Scaleway vLLM node."}
 
 @app.get("/playbook")
 async def get_playbook():
