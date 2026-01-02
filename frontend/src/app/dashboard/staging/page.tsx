@@ -98,7 +98,7 @@ export default function StagingArea() {
           <span className="system-label">CONTEXT: STRATEGIC</span>
           <span className="system-label text-red-500 font-bold">BUILD: 7949b38</span>
         </div>
-        <h2 className="text-5xl font-bold tracking-tighter text-foreground">Staging Area</h2>
+        <h2 className="text-5xl font-bold tracking-tighter text-foreground uppercase">STAGING_V2</h2>
         <p className="text-muted-foreground text-xl max-w-2xl font-medium leading-relaxed">
           Intelligence synthesized from multi-node streams. Review and authorize <span className="text-foreground font-bold underline decoration-border decoration-2 underline-offset-4">strategic actions</span>.
         </p>
