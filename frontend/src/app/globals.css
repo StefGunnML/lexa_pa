@@ -3,83 +3,71 @@
 @tailwind utilities;
 
 :root {
-  --background: 0 0% 2%; /* Machined Graphite #050505 */
-  --foreground: 38 100% 50%; /* High-Density Amber Phosphor #FFB000 */
-  --card: 0 0% 4%;
-  --card-foreground: 38 100% 50%;
-  --border: 38 100% 20%; /* Dim Amber for grid/borders */
-  --primary: 38 100% 50%;
-  --primary-foreground: 0 0% 0%;
-  --accent: 38 100% 15%;
-  --accent-foreground: 38 100% 50%;
-  --muted: 0 0% 8%;
-  --muted-foreground: 38 50% 30%; /* Dimmer Amber */
+  --background: 0 0% 98%; /* Paper White #fdfdfd */
+  --foreground: 0 0% 10%; /* Sharp Charcoal #1a1a1a */
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 10%;
+  --border: 0 0% 0%; /* Absolute Black for crisp lines */
+  --primary: 0 0% 10%;
+  --primary-foreground: 0 0% 100%;
+  --accent: 0 0% 90%;
+  --accent-foreground: 0 0% 10%;
+  --muted: 0 0% 95%;
+  --muted-foreground: 0 0% 40%;
 }
 
 @layer base {
   body {
-    @apply bg-[#050505] text-[#FFB000] antialiased selection:bg-[#FFB000]/20;
-    /* Subtle scanline effect */
-    background-image: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
-                      linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-    background-size: 100% 2px, 3px 100%;
+    @apply bg-[#fdfdfd] text-[#1a1a1a] antialiased selection:bg-[#1a1a1a] selection:text-white;
+    /* Subtle paper texture and system grid */
+    background-image: 
+      radial-gradient(#1a1a1a 0.5px, transparent 0.5px),
+      linear-gradient(rgba(0,0,0,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,0,0,0.02) 1px, transparent 1px);
+    background-size: 20px 20px, 40px 40px, 40px 40px;
+    background-position: 0 0, 0 0, 0 0;
   }
 }
 
 .luxury-card {
-  @apply bg-black/80 border border-[#FFB000]/30 shadow-[0_0_15px_rgba(255,176,0,0.05)] relative overflow-hidden;
-}
-
-.luxury-card::before {
-  content: "";
-  @apply absolute inset-0 pointer-events-none opacity-[0.03];
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 1px,
-    #FFB000 2px
-  );
+  @apply bg-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] relative;
+  /* Beveled effect simulation */
+  box-shadow: 4px 4px 0px 0px #000;
 }
 
 .mercury-border {
-  @apply border border-[#FFB000]/20;
+  @apply border border-black;
 }
 
 .text-mercury-muted {
-  @apply text-[#FFB000]/40 font-mono uppercase text-[10px] tracking-widest;
+  @apply text-black font-mono uppercase text-[10px] tracking-[0.2em] font-bold;
 }
 
 .italic-mercury {
-  @apply font-mono text-[#FFB000] tracking-tight;
-  font-size: 1em;
-  line-height: 1.5;
+  @apply font-serif italic text-black/80 tracking-tight;
+  font-size: 1.1em;
+  line-height: 1.6;
 }
 
 .high-focus-title {
-  @apply text-[#FFB000] font-mono font-bold uppercase tracking-tight;
-  text-shadow: 0 0 10px rgba(255,176,0,0.3);
+  @apply text-black font-mono font-black uppercase tracking-tighter;
+  letter-spacing: -0.05em;
 }
 
-@keyframes flicker {
-  0% { opacity: 0.97; }
-  5% { opacity: 0.95; }
-  10% { opacity: 0.9; }
-  15% { opacity: 0.95; }
-  20% { opacity: 0.98; }
-  25% { opacity: 0.95; }
-  30% { opacity: 0.9; }
-  100% { opacity: 1; }
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
 }
 
-.animate-flicker {
-  animation: flicker 0.15s infinite;
+.animate-cursor {
+  animation: cursor-blink 1s step-end infinite;
 }
 
 @keyframes breathe {
-  0%, 100% { opacity: 1; box-shadow: 0 0 15px rgba(255,176,0,0.1); }
-  50% { opacity: 0.8; box-shadow: 0 0 25px rgba(255,176,0,0.3); }
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-1px, -1px); }
 }
 
 .animate-breathe {
-  animation: breathe 3s ease-in-out infinite;
+  animation: breathe 4s ease-in-out infinite;
 }

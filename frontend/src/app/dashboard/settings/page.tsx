@@ -119,51 +119,51 @@ export default function SettingsPage() {
     <div className="space-y-16 pb-20 font-mono">
       <header className="space-y-6">
         <div className="flex items-center gap-2">
-          <span className="text-[11px] font-bold text-[#FFB000]/40 uppercase tracking-[0.4em]">SYSTEM_CALIBRATION_NODE</span>
+          <span className="text-[11px] font-black text-white bg-black px-2 py-0.5 uppercase tracking-[0.4em]">SYSTEM_CALIBRATION_NODE</span>
         </div>
-        <h2 className="text-6xl font-bold tracking-tighter text-[#FFB000] uppercase animate-flicker">System Command</h2>
-        <p className="text-[#FFB000]/60 text-lg max-w-2xl font-medium leading-relaxed uppercase">
-          Configure private reasoning nodes... calibrate communication nodes... define <span className="text-[#FFB000] underline underline-offset-8">strategic_principles</span>.
+        <h2 className="text-7xl font-black tracking-tighter text-black uppercase">System Command</h2>
+        <p className="text-black/60 text-2xl max-w-2xl font-bold leading-relaxed uppercase tracking-tighter">
+          Calibrate private reasoning nodes... authenticate <span className="text-black underline underline-offset-8 decoration-4">COMM_CHANNELS</span>.
         </p>
       </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
         
         {/* Step 1: Reasoning Engine */}
-        <Card className={`space-y-10 border-[#FFB000]/20 ${pulseStatus === 'active' ? 'animate-breathe' : ''}`}>
+        <Card className={`space-y-10 border-4 border-black ${pulseStatus === 'active' ? 'animate-breathe' : ''}`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="p-3 border border-[#FFB000]/20 text-[#FFB000]">
-                <Zap size={24} />
+              <div className="p-3 border-4 border-black bg-black text-white">
+                <Zap size={28} />
               </div>
-              <h3 className="text-2xl font-bold text-[#FFB000] tracking-tighter uppercase">Reasoning Engine</h3>
+              <h3 className="text-3xl font-black text-black tracking-tighter uppercase">Reasoning Node</h3>
             </div>
-            <Badge variant={pulseStatus === 'active' ? 'success' : pulseStatus === 'error' ? 'warning' : 'default'} className="font-bold border-[#FFB000]/40">
+            <Badge variant={pulseStatus === 'active' ? 'success' : pulseStatus === 'error' ? 'warning' : 'default'} className="font-black border-4">
               {pulseStatus.toUpperCase()}
             </Badge>
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-8">
             <div className="space-y-3">
-              <label className="text-[10px] font-bold text-[#FFB000]/40 uppercase tracking-[0.2em]">SCALEWAY_IP_ENDPOINT</label>
+              <label className="text-xs font-black text-black uppercase tracking-[0.2em]">SCALEWAY_IP_ADDRESS</label>
               <input 
                 type="text" 
                 value={config.DEEPSEEK_API_BASE || ''}
                 onChange={(e) => setConfig({...config, DEEPSEEK_API_BASE: e.target.value})}
                 onBlur={(e) => saveConfig('DEEPSEEK_API_BASE', e.target.value)}
-                placeholder="http://51.159.141.13:8000/v1"
-                className="w-full bg-black border border-[#FFB000]/20 rounded-none px-5 py-4 text-sm text-[#FFB000] focus:outline-none focus:border-[#FFB000]/60 transition-all placeholder:text-[#FFB000]/10"
+                placeholder="0.0.0.0"
+                className="w-full bg-white border-4 border-black px-6 py-5 text-lg font-black text-black focus:outline-none focus:bg-black focus:text-white transition-all placeholder:text-black/10"
               />
             </div>
             <div className="space-y-3">
-              <label className="text-[10px] font-bold text-[#FFB000]/40 uppercase tracking-[0.2em]">SECRET_ACCESS_KEY</label>
+              <label className="text-xs font-black text-black uppercase tracking-[0.2em]">SECURE_ACCESS_KEY</label>
               <input 
                 type="password" 
                 value={config.DEEPSEEK_API_KEY || ''}
                 onChange={(e) => setConfig({...config, DEEPSEEK_API_KEY: e.target.value})}
                 onBlur={(e) => saveConfig('DEEPSEEK_API_KEY', e.target.value)}
-                placeholder="••••••••••••••••"
-                className="w-full bg-black border border-[#FFB000]/20 rounded-none px-5 py-4 text-sm text-[#FFB000] focus:outline-none focus:border-[#FFB000]/60 transition-all placeholder:text-[#FFB000]/10"
+                placeholder="••••••••"
+                className="w-full bg-white border-4 border-black px-6 py-5 text-lg font-black text-black focus:outline-none focus:bg-black focus:text-white transition-all placeholder:text-black/10"
               />
             </div>
           </div>
@@ -171,71 +171,71 @@ export default function SettingsPage() {
           <Button 
             onClick={testPulse} 
             disabled={pulseStatus === 'testing'}
-            className="w-full py-8"
+            className="w-full py-10 text-xl"
             variant={pulseStatus === 'active' ? 'primary' : 'secondary'}
           >
-            {pulseStatus === 'testing' ? <RefreshCw className="animate-spin" size={18} /> : <Play size={18} />}
-            INITIATE_PULSE_CHECK
+            {pulseStatus === 'testing' ? <RefreshCw className="animate-spin" size={24} /> : <Play size={24} />}
+            INIT_PULSE_CHECK
           </Button>
         </Card>
 
         {/* Step 2: Communication Nodes */}
-        <Card className="space-y-10 border-[#FFB000]/20">
+        <Card className="space-y-10 border-4 border-black">
           <div className="flex items-center gap-4">
-            <div className="p-3 border border-[#FFB000]/20 text-[#FFB000]">
-              <MessageSquare size={24} />
+            <div className="p-3 border-4 border-black bg-black text-white">
+              <MessageSquare size={28} />
             </div>
-            <h3 className="text-2xl font-bold text-[#FFB000] tracking-tighter uppercase">Communication Nodes</h3>
+            <h3 className="text-3xl font-black text-black tracking-tighter uppercase">Comm Nodes</h3>
           </div>
 
-          <div className="space-y-4">
-            <div className="p-6 bg-black border border-[#FFB000]/10 flex items-center justify-between hover:bg-[#FFB000]/5 transition-all">
-              <div className="flex items-center gap-5">
-                <div className="w-12 h-12 border border-[#FFB000]/20 flex items-center justify-center text-sm font-bold text-[#FFB000]/40">G</div>
+          <div className="space-y-6">
+            <div className="p-8 border-4 border-black bg-white flex items-center justify-between hover:bg-black hover:text-white transition-all group">
+              <div className="flex items-center gap-6">
+                <div className="w-14 h-14 border-4 border-black flex items-center justify-center text-xl font-black bg-black text-white group-hover:bg-white group-hover:text-black transition-all">G</div>
                 <div>
-                  <p className="text-base font-bold text-[#FFB000] tracking-tighter uppercase">Gmail Intelligence</p>
-                  <p className="text-[10px] text-[#FFB000]/40 uppercase tracking-widest font-bold">gmail-sync</p>
+                  <p className="text-lg font-black tracking-tighter uppercase">Gmail_INTEL</p>
+                  <p className="text-xs font-bold uppercase opacity-40 group-hover:opacity-100">SYNC_ACTIVE</p>
                 </div>
               </div>
-              <Button size="sm" variant="outline" onClick={() => connectService('google-gmail')} className="font-bold border-[#FFB000]/20">LINK</Button>
+              <Button size="sm" variant="outline" onClick={() => connectService('google-gmail')} className="font-black border-4 group-hover:border-white">LINK</Button>
             </div>
 
-            <div className="p-6 bg-black border border-[#FFB000]/10 flex items-center justify-between hover:bg-[#FFB000]/5 transition-all">
-              <div className="flex items-center gap-5">
-                <div className="w-12 h-12 border border-[#FFB000]/20 flex items-center justify-center text-sm font-bold text-[#FFB000]/40">S</div>
+            <div className="p-8 border-4 border-black bg-white flex items-center justify-between hover:bg-black hover:text-white transition-all group">
+              <div className="flex items-center gap-6">
+                <div className="w-14 h-14 border-4 border-black flex items-center justify-center text-xl font-black bg-black text-white group-hover:bg-white group-hover:text-black transition-all">S</div>
                 <div>
-                  <p className="text-base font-bold text-[#FFB000] tracking-tighter uppercase">Slack Stream</p>
-                  <p className="text-[10px] text-[#FFB000]/40 uppercase tracking-widest font-bold">slack-messages</p>
+                  <p className="text-lg font-black tracking-tighter uppercase">Slack_INTEL</p>
+                  <p className="text-xs font-bold uppercase opacity-40 group-hover:opacity-100">STREAM_ACTIVE</p>
                 </div>
               </div>
-              <Button size="sm" variant="outline" onClick={() => connectService('slack')} className="font-bold border-[#FFB000]/20">LINK</Button>
+              <Button size="sm" variant="outline" onClick={() => connectService('slack')} className="font-black border-4 group-hover:border-white">LINK</Button>
             </div>
           </div>
 
-          <div className="p-6 bg-[#FFB000]/5 border border-[#FFB000]/10">
-            <p className="text-[11px] text-[#FFB000]/60 leading-relaxed font-bold uppercase tracking-tighter">
-              Notice: Auth managed via <span className="text-[#FFB000] underline">Nango_Secure_Vault</span>. Project_Compass does not store raw credentials.
+          <div className="p-6 bg-black text-white border-4 border-black">
+            <p className="text-xs leading-relaxed font-black uppercase tracking-widest">
+              NOTICE: CRYPTO_VAULT MANAGED BY NANGO. NO RAW KEYS STORED.
             </p>
           </div>
         </Card>
 
         {/* Step 3: Strategic Playbook */}
-        <Card className="lg:col-span-2 space-y-8 border-[#FFB000]/20">
+        <Card className="lg:col-span-2 space-y-10 border-4 border-black">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="p-3 border border-[#FFB000]/20 text-[#FFB000]">
-                <Shield size={24} />
+              <div className="p-3 border-4 border-black bg-black text-white">
+                <Shield size={28} />
               </div>
-              <h3 className="text-2xl font-bold text-[#FFB000] tracking-tighter uppercase">Founder Playbook</h3>
+              <h3 className="text-3xl font-black text-black tracking-tighter uppercase">Founder_Playbook</h3>
             </div>
             <Button 
               onClick={savePlaybook} 
               variant="primary" 
-              className="px-10 py-4 shadow-xl"
+              className="px-12 py-6 text-lg"
               disabled={saving}
             >
-              <Save size={18} />
-              SAVE_PRINCIPLES
+              <Save size={20} />
+              COMMIT_LOGIC
             </Button>
           </div>
 
@@ -243,8 +243,8 @@ export default function SettingsPage() {
             <textarea 
               value={playbook}
               onChange={(e) => setPlaybook(e.target.value)}
-              className="relative w-full h-80 bg-black border border-[#FFB000]/20 p-10 text-xl text-[#FFB000]/80 leading-relaxed font-mono focus:outline-none focus:border-[#FFB000]/60 transition-all placeholder:text-[#FFB000]/10"
-              placeholder="# ENTER_CORE_PRINCIPLES_HERE..."
+              className="relative w-full h-96 bg-white border-4 border-black p-12 text-2xl text-black font-black leading-relaxed font-mono focus:outline-none focus:bg-black focus:text-white transition-all placeholder:text-black/10 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]"
+              placeholder="# INPUT_STRATEGIC_PRINCIPLES..."
             />
           </div>
         </Card>

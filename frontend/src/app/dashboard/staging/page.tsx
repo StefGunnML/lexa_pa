@@ -74,45 +74,43 @@ export default function StagingArea() {
     <div className="space-y-24 pb-20 font-mono">
       <header className="space-y-8">
         <div className="flex items-center gap-2">
-          <span className="text-[11px] font-bold text-[#FFB000]/40 uppercase tracking-[0.4em]">SYSTEM_INGESTION_STATUS</span>
+          <span className="text-[11px] font-black text-black uppercase tracking-[0.4em] bg-black text-white px-2 py-0.5">STATUS: READY</span>
         </div>
-        <h2 className="text-6xl font-bold tracking-tighter text-[#FFB000] uppercase animate-flicker">Staging Area</h2>
-        <p className="text-[#FFB000]/60 text-xl max-w-2xl font-medium leading-relaxed uppercase">
-          Synthesizing raw data from primary nodes... Authorize <span className="text-[#FFB000] underline underline-offset-8">strategic_actions</span>.
+        <h2 className="text-7xl font-black tracking-tighter text-black uppercase">Staging Area</h2>
+        <p className="text-black/60 text-2xl max-w-2xl font-bold leading-relaxed uppercase tracking-tighter">
+          Synthesizing intelligence... Select <span className="text-black underline underline-offset-8 decoration-4">COMMAND_ACTION</span> to proceed.
         </p>
       </header>
 
       {loading ? (
         <div className="flex flex-col items-center justify-center p-32 gap-6">
-          <div className="w-10 h-10 border-t-2 border-[#FFB000] animate-spin"></div>
-          <p className="text-[11px] font-bold text-[#FFB000] uppercase tracking-[0.2em]">SYNCING_GLOBAL_STATE</p>
+          <div className="w-12 h-12 border-4 border-black border-t-transparent animate-spin"></div>
+          <p className="text-sm font-black text-black uppercase tracking-[0.3em]">LOADING_SYSTEM_RESOURCES</p>
         </div>
       ) : (
-        <div className="space-y-12">
+        <div className="space-y-16">
           {actions.length === 0 ? (
-            <div className="text-center p-32 border border-[#FFB000]/10 bg-[#FFB000]/5">
-              <p className="text-[#FFB000]/40 text-sm uppercase tracking-[0.4em] font-bold">NO_PENDING_TASKS_FOUND</p>
+            <div className="text-center p-32 border-4 border-dashed border-black">
+              <p className="text-black/40 text-xl uppercase tracking-[0.4em] font-black">SYSTEM_IDLE</p>
             </div>
           ) : (
             actions.map(action => (
-              <Card key={action.id} className="border-[#FFB000]/20 hover:border-[#FFB000]/50 transition-all duration-300">
+              <Card key={action.id} className="group">
                 <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-16">
                   <div className="flex-1 space-y-12">
                     <div className="flex flex-wrap items-center gap-10">
-                      <Badge variant={action.type === 'merge_profiles' ? 'warning' : 'default'} className="font-bold border-[#FFB000]/40">
-                        {action.type.toUpperCase()}
+                      <Badge variant={action.type === 'merge_profiles' ? 'warning' : 'default'} className="text-xs">
+                        TYPE: {action.type.toUpperCase()}
                       </Badge>
                       
                       <div className="flex items-center gap-8">
                         {action.confidence_score >= 0.85 ? (
-                          <div className="flex items-center gap-3 text-emerald-500 font-bold text-[10px] uppercase tracking-widest">
-                            <div className="w-1.5 h-1.5 bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></div>
-                            VERIFIED_INTEL
+                          <div className="flex items-center gap-3 text-black font-black text-[10px] uppercase tracking-widest border-2 border-black px-3 py-1">
+                            INTEL_VERIFIED
                           </div>
                         ) : (
-                          <div className="flex items-center gap-3 text-amber-500 font-bold text-[10px] uppercase tracking-widest">
-                            <div className="w-1.5 h-1.5 bg-amber-500 animate-pulse shadow-[0_0_8px_rgba(245,158,11,0.8)]"></div>
-                            LOW_CONFIDENCE
+                          <div className="flex items-center gap-3 text-white bg-black font-black text-[10px] uppercase tracking-widest px-3 py-1 animate-pulse">
+                            REVIEW_REQUIRED
                           </div>
                         )}
 
@@ -121,31 +119,31 @@ export default function StagingArea() {
                             href={action.source_link} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="text-[10px] font-bold text-[#FFB000]/40 hover:text-[#FFB000] transition-all uppercase tracking-widest border-b border-[#FFB000]/20 hover:border-[#FFB000] pb-1"
+                            className="text-[10px] font-black text-black/40 hover:text-black transition-all uppercase tracking-widest underline decoration-2"
                           >
-                            [VIEW_SOURCE]
+                            [VIEW_SRC]
                           </a>
                         )}
                       </div>
                     </div>
 
-                    <div className="space-y-6">
+                    <div className="space-y-8">
                       {action.type === 'calendar_invite' && (
                         <div className="space-y-4">
-                          <h3 className="text-4xl font-bold text-[#FFB000] tracking-tighter uppercase">{action.data.title}</h3>
-                          <p className="text-2xl text-[#FFB000]/60 font-medium">
-                            SCHEDULED: {new Date(action.data.deadline).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }).toUpperCase()}
+                          <h3 className="text-5xl font-black text-black tracking-tighter uppercase">{action.data.title}</h3>
+                          <p className="text-2xl text-black/60 font-bold uppercase">
+                            EXEC_DATE: {new Date(action.data.deadline).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }).toUpperCase()}
                           </p>
                         </div>
                       )}
 
                       {action.type === 'merge_profiles' && (
                         <div className="space-y-8">
-                          <h3 className="text-4xl font-bold text-[#FFB000] tracking-tighter uppercase">IDENTITY_MATCH: {action.data.name.toUpperCase()}</h3>
-                          <div className="flex flex-wrap gap-5">
+                          <h3 className="text-5xl font-black text-black tracking-tighter uppercase">MATCH: {action.data.name.toUpperCase()}</h3>
+                          <div className="flex flex-wrap gap-4">
                             {action.data.platforms.map((p: string, i: number) => (
-                              <div key={i} className="px-6 py-4 bg-black border border-[#FFB000]/20 text-sm font-bold text-[#FFB000]/80">
-                                {p.toUpperCase()}
+                              <div key={i} className="px-6 py-4 bg-black text-white text-sm font-black uppercase tracking-tighter">
+                                {p}
                               </div>
                             ))}
                           </div>
@@ -155,34 +153,34 @@ export default function StagingArea() {
                       {action.type === 'email_draft' && (
                         <div className="space-y-10">
                           <div className="space-y-3">
-                            <h3 className="text-4xl font-bold text-[#FFB000] tracking-tighter uppercase">{action.data.subject.toUpperCase()}</h3>
-                            <p className="text-xl text-[#FFB000]/40 font-medium font-mono">RECIPIENT: {action.data.to}</p>
+                            <h3 className="text-5xl font-black text-black tracking-tighter uppercase">{action.data.subject.toUpperCase()}</h3>
+                            <p className="text-xl text-black/40 font-black">TO: {action.data.to}</p>
                           </div>
-                          <div className="p-12 bg-black border border-[#FFB000]/10 text-xl leading-relaxed text-[#FFB000]/80 italic">
+                          <div className="p-12 border-4 border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] text-2xl leading-relaxed text-black font-serif italic">
                             "{action.data.body}"
                           </div>
                         </div>
                       )}
                     </div>
 
-                    <div className="p-10 bg-[#FFB000]/5 border-l-2 border-[#FFB000]/40 space-y-5">
-                      <div className="flex items-center gap-4 opacity-60">
-                        <span className="text-[11px] font-bold text-[#FFB000] uppercase tracking-[0.4em]">STRATEGIC_LOGIC</span>
+                    <div className="p-10 border-4 border-black bg-black text-white space-y-5">
+                      <div className="flex items-center gap-4">
+                        <span className="text-[11px] font-black uppercase tracking-[0.4em]"># STRATEGIC_LOGIC_70B</span>
                       </div>
-                      <p className="text-lg font-medium text-[#FFB000]/80 leading-relaxed italic">
-                        {action.data.reasoning || "Analyzing communication streams for strategic leverage points..."}
+                      <p className="text-xl font-bold leading-relaxed tracking-tighter">
+                        {action.data.reasoning || "Analyzing communication vectors for strategic dominance..."}
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex flex-row lg:flex-col gap-5 min-w-[200px]">
-                    <Button onClick={() => handleAction(action.id, 'approved')} variant="primary" className="flex-1 py-8">
+                  <div className="flex flex-row lg:flex-col gap-6 min-w-[220px]">
+                    <Button onClick={() => handleAction(action.id, 'approved')} variant="primary" className="flex-1 text-lg">
                       EXECUTE
                     </Button>
-                    <Button onClick={() => {}} variant="secondary" className="flex-1 py-8">
-                      MODIFY
+                    <Button onClick={() => {}} variant="secondary" className="flex-1 text-lg">
+                      RE-CODE
                     </Button>
-                    <Button onClick={() => handleAction(action.id, 'rejected')} variant="destructive" className="flex-1 py-8 opacity-60">
+                    <Button onClick={() => handleAction(action.id, 'rejected')} variant="destructive" className="flex-1 text-lg">
                       SCRAP
                     </Button>
                   </div>

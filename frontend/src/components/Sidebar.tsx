@@ -39,40 +39,40 @@ export function Sidebar() {
   ];
 
   return (
-    <aside className="w-72 border-r border-[#FFB000]/20 bg-black p-10 flex flex-col font-mono">
+    <aside className="w-72 border-r-2 border-black bg-white p-10 flex flex-col font-mono shadow-[4px_0px_0px_0px_rgba(0,0,0,1)]">
       <div className="flex items-center gap-4 mb-20">
-        <div className="w-10 h-10 border border-[#FFB000] flex items-center justify-center shadow-[0_0_10px_rgba(255,176,0,0.3)]">
-          <span className="text-[#FFB000] font-bold text-sm tracking-tighter">C:</span>
+        <div className="w-10 h-10 border-2 border-black flex items-center justify-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] bg-black">
+          <span className="text-white font-black text-lg tracking-tighter">C:</span>
         </div>
-        <h1 className="text-sm font-bold tracking-[0.3em] text-[#FFB000] uppercase animate-pulse">
+        <h1 className="text-sm font-black tracking-[0.2em] text-black uppercase">
           COMPASS_OS
         </h1>
       </div>
       
-      <nav className="space-y-10 flex-1">
-        <div className="space-y-4">
-          <p className="text-[10px] font-bold text-[#FFB000]/30 tracking-[0.2em] uppercase ml-1"># DIRECTORY</p>
+      <nav className="space-y-12 flex-1">
+        <div className="space-y-6">
+          <p className="text-[10px] font-black text-black tracking-[0.3em] uppercase ml-1 underline underline-offset-4"># INDEX</p>
           {navItems.map((item) => {
             const isActive = pathname === item.href || (item.href !== '/dashboard/staging' && pathname?.startsWith(item.href));
             return (
               <Link 
                 key={item.name} 
                 href={item.href} 
-                className={`flex items-center gap-4 py-3 px-1 text-[0.85rem] transition-all group ${isActive ? 'text-[#FFB000] font-bold' : 'text-[#FFB000]/40 hover:text-[#FFB000]/80'}`}
+                className={`flex items-center gap-4 py-3 px-2 text-[0.85rem] transition-all group ${isActive ? 'bg-black text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)]' : 'text-black hover:bg-black/5'}`}
               >
-                <div className={`w-2 h-2 transition-all duration-500 ${isActive ? 'bg-[#FFB000] shadow-[0_0_8px_rgba(255,176,0,0.8)]' : 'bg-transparent border border-[#FFB000]/20 group-hover:border-[#FFB000]/40'}`}></div>
-                {isActive ? `> ${item.name.toUpperCase()}` : item.name.toUpperCase()}
+                <div className={`w-2 h-2 transition-all duration-300 ${isActive ? 'bg-white' : 'bg-black'}`}></div>
+                <span className="font-black tracking-widest">{item.name.toUpperCase()}</span>
               </Link>
             );
           })}
         </div>
       </nav>
       
-      <div className="pt-10 border-t border-[#FFB000]/10">
-        <div className="flex items-center gap-4 px-1 opacity-60 hover:opacity-100 transition-opacity">
-          <div className="w-2 h-2 bg-[#FFB000] animate-flicker"></div>
+      <div className="pt-10 border-t-2 border-black">
+        <div className="flex items-center gap-4 px-1 group">
+          <div className="w-3 h-3 border-2 border-black bg-black group-hover:bg-white transition-colors animate-cursor"></div>
           <div>
-            <p className="text-[10px] font-bold text-[#FFB000] uppercase tracking-[0.2em]">NODE_ONLINE</p>
+            <p className="text-[10px] font-black text-black uppercase tracking-[0.2em]">NODE_ACTIVE</p>
           </div>
         </div>
       </div>

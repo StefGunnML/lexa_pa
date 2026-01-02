@@ -36,7 +36,7 @@ export default function RootLayout({
 
   return (
     <html lang="en" className="dark">
-          <body className={`${inter.className} bg-[#050505] text-[#FFB000] antialiased selection:bg-[#FFB000]/20`}>
+          <body className={`${inter.className} bg-[#fdfdfd] text-[#1a1a1a] antialiased selection:bg-[#1a1a1a] selection:text-white`}>
             <div className="flex h-screen overflow-hidden">
               <Sidebar />
               
