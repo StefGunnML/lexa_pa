@@ -97,6 +97,18 @@ async def update_playbook(data: PlaybookUpdate):
     db.close()
     return {"status": "saved"}
 
+@app.get("/nango/debug-connections")
+async def debug_nango_connections():
+    db = SessionLocal()
+    nango_secret_entry = db.query(SystemConfig).filter(SystemConfig.key == "NANGO_SECRET_KEY").first()
+    db.close()
+    nango_secret = nango_secret_entry.value if nango_secret_entry else os.getenv("NANGO_SECRET_KEY")
+    
+    async with httpx.AsyncClient() as client:
+        # Check all established connections
+        res = await client.get("https://api.nango.dev/connection", headers={"Authorization": f"Bearer {nango_secret}"})
+        return res.json()
+
 @app.get("/nango/debug-config")
 async def debug_nango_config():
     db = SessionLocal()
