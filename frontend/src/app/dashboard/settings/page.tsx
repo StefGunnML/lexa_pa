@@ -101,7 +101,6 @@ export default function SettingsPage() {
       const connect = nango.openConnectUI({
         onEvent: (event) => {
           if (event.type === 'connect') {
-            console.log(`Successfully connected to ${provider}`);
             // The connection is now active in Nango
           }
         },
@@ -132,106 +131,114 @@ export default function SettingsPage() {
         
         {/* Step 1: Reasoning Engine */}
         <Card className="space-y-10">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-muted text-foreground">
-                <Zap size={20} />
+          <form className="space-y-10" onSubmit={(e) => e.preventDefault()}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-muted text-foreground">
+                  <Zap size={20} />
+                </div>
+                <h3 className="text-xl font-bold text-foreground tracking-tight">REASONING_NODE</h3>
               </div>
-              <h3 className="text-xl font-bold text-foreground tracking-tight">REASONING_NODE</h3>
+              <Badge variant={pulseStatus === 'active' ? 'success' : pulseStatus === 'error' ? 'warning' : 'default'}>
+                {pulseStatus.toUpperCase()}
+              </Badge>
             </div>
-            <Badge variant={pulseStatus === 'active' ? 'success' : pulseStatus === 'error' ? 'warning' : 'default'}>
-              {pulseStatus.toUpperCase()}
-            </Badge>
-          </div>
 
-          <div className="space-y-6">
-            <div className="space-y-2">
-              <label className="text-[9px] font-medium text-muted-foreground uppercase tracking-[0.2em]">SCALEWAY_IP_ENDPOINT</label>
-              <input 
-                type="text" 
-                value={config.DEEPSEEK_API_BASE || ''}
-                onChange={(e) => setConfig({...config, DEEPSEEK_API_BASE: e.target.value})}
-                onBlur={(e) => saveConfig('DEEPSEEK_API_BASE', e.target.value)}
-                placeholder="0.0.0.0"
-                className="w-full bg-muted border border-border px-5 py-3 text-sm text-foreground focus:outline-none focus:border-foreground/20 transition-all placeholder:text-muted-foreground/30 font-mono"
-              />
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <label className="text-[9px] font-medium text-muted-foreground uppercase tracking-[0.2em]">SCALEWAY_IP_ENDPOINT</label>
+                <input 
+                  type="text" 
+                  value={config.DEEPSEEK_API_BASE || ''}
+                  onChange={(e) => setConfig({...config, DEEPSEEK_API_BASE: e.target.value})}
+                  onBlur={(e) => saveConfig('DEEPSEEK_API_BASE', e.target.value)}
+                  placeholder="0.0.0.0"
+                  autoComplete="url"
+                  className="w-full bg-muted border border-border px-5 py-3 text-sm text-foreground focus:outline-none focus:border-foreground/20 transition-all placeholder:text-muted-foreground/30 font-mono"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[9px] font-medium text-muted-foreground uppercase tracking-[0.2em]">ACCESS_KEY</label>
+                <input 
+                  type="password" 
+                  value={config.DEEPSEEK_API_KEY || ''}
+                  onChange={(e) => setConfig({...config, DEEPSEEK_API_KEY: e.target.value})}
+                  onBlur={(e) => saveConfig('DEEPSEEK_API_KEY', e.target.value)}
+                  placeholder="••••••••"
+                  autoComplete="current-password"
+                  className="w-full bg-muted border border-border px-5 py-3 text-sm text-foreground focus:outline-none focus:border-foreground/20 transition-all placeholder:text-muted-foreground/30 font-mono"
+                />
+              </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-[9px] font-medium text-muted-foreground uppercase tracking-[0.2em]">ACCESS_KEY</label>
-              <input 
-                type="password" 
-                value={config.DEEPSEEK_API_KEY || ''}
-                onChange={(e) => setConfig({...config, DEEPSEEK_API_KEY: e.target.value})}
-                onBlur={(e) => saveConfig('DEEPSEEK_API_KEY', e.target.value)}
-                placeholder="••••••••"
-                className="w-full bg-muted border border-border px-5 py-3 text-sm text-foreground focus:outline-none focus:border-foreground/20 transition-all placeholder:text-muted-foreground/30 font-mono"
-              />
-            </div>
-          </div>
 
-          <Button 
-            onClick={testPulse} 
-            disabled={pulseStatus === 'testing'}
-            className="w-full"
-            variant="primary"
-          >
-            {pulseStatus === 'testing' ? <RefreshCw className="animate-spin" size={16} /> : <Play size={16} className="mr-2" />}
-            INITIATE_PULSE_CHECK
-          </Button>
+            <Button 
+              onClick={testPulse} 
+              disabled={pulseStatus === 'testing'}
+              className="w-full"
+              variant="primary"
+              type="button"
+            >
+              {pulseStatus === 'testing' ? <RefreshCw className="animate-spin" size={16} /> : <Play size={16} className="mr-2" />}
+              INITIATE_PULSE_CHECK
+            </Button>
+          </form>
         </Card>
 
         {/* Step 2: Communication Nodes */}
         <Card className="space-y-10">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-muted text-foreground">
-              <MessageSquare size={20} />
-            </div>
-            <h3 className="text-xl font-bold text-foreground tracking-tight">COMM_NODES</h3>
-          </div>
-
-          <div className="space-y-6">
-            <div className="space-y-2">
-              <label className="text-[9px] font-medium text-muted-foreground uppercase tracking-[0.2em]">NANGO_SECRET_KEY</label>
-              <input 
-                type="password" 
-                value={config.NANGO_SECRET_KEY || ''}
-                onChange={(e) => setConfig({...config, NANGO_SECRET_KEY: e.target.value})}
-                onBlur={(e) => saveConfig('NANGO_SECRET_KEY', e.target.value)}
-                placeholder="nango_sk_..."
-                className="w-full bg-muted border border-border px-5 py-3 text-sm text-foreground focus:outline-none focus:border-foreground/20 transition-all placeholder:text-muted-foreground/30 font-mono"
-              />
+          <form className="space-y-10" onSubmit={(e) => e.preventDefault()}>
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-muted text-foreground">
+                <MessageSquare size={20} />
+              </div>
+              <h3 className="text-xl font-bold text-foreground tracking-tight">COMM_NODES</h3>
             </div>
 
-            <div className="space-y-3">
-              <div className="p-5 bg-muted border border-border flex items-center justify-between hover:border-foreground/20 transition-all group">
-                <div className="flex items-center gap-4">
-                  <div className="w-8 h-8 bg-white border border-border flex items-center justify-center text-[10px] font-bold text-muted-foreground">G</div>
-                  <div>
-                    <p className="text-sm font-bold text-foreground tracking-tight">GMAIL_INTEL</p>
-                    <p className="text-[9px] font-medium text-muted-foreground uppercase tracking-widest">SYNC_READY</p>
-                  </div>
-                </div>
-                <Button size="sm" variant="outline" onClick={() => connectService('google-gmail')}>Link</Button>
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <label className="text-[9px] font-medium text-muted-foreground uppercase tracking-[0.2em]">NANGO_SECRET_KEY</label>
+                <input 
+                  type="password" 
+                  value={config.NANGO_SECRET_KEY || ''}
+                  onChange={(e) => setConfig({...config, NANGO_SECRET_KEY: e.target.value})}
+                  onBlur={(e) => saveConfig('NANGO_SECRET_KEY', e.target.value)}
+                  placeholder="nango_sk_..."
+                  autoComplete="current-password"
+                  className="w-full bg-muted border border-border px-5 py-3 text-sm text-foreground focus:outline-none focus:border-foreground/20 transition-all placeholder:text-muted-foreground/30 font-mono"
+                />
               </div>
 
-              <div className="p-5 bg-muted border border-border flex items-center justify-between hover:border-foreground/20 transition-all group">
-                <div className="flex items-center gap-4">
-                  <div className="w-8 h-8 bg-white border border-border flex items-center justify-center text-[10px] font-bold text-muted-foreground">S</div>
-                  <div>
-                    <p className="text-sm font-bold text-foreground tracking-tight">SLACK_INTEL</p>
-                    <p className="text-[9px] font-medium text-muted-foreground uppercase tracking-widest">STREAM_READY</p>
+              <div className="space-y-3">
+                <div className="p-5 bg-muted border border-border flex items-center justify-between hover:border-foreground/20 transition-all group">
+                  <div className="flex items-center gap-4">
+                    <div className="w-8 h-8 bg-white border border-border flex items-center justify-center text-[10px] font-bold text-muted-foreground">G</div>
+                    <div>
+                      <p className="text-sm font-bold text-foreground tracking-tight">GMAIL_INTEL</p>
+                      <p className="text-[9px] font-medium text-muted-foreground uppercase tracking-widest">SYNC_READY</p>
+                    </div>
                   </div>
+                  <Button size="sm" variant="outline" type="button" onClick={() => connectService('google-gmail')}>Link</Button>
                 </div>
-                <Button size="sm" variant="outline" onClick={() => connectService('slack')}>Link</Button>
+
+                <div className="p-5 bg-muted border border-border flex items-center justify-between hover:border-foreground/20 transition-all group">
+                  <div className="flex items-center gap-4">
+                    <div className="w-8 h-8 bg-white border border-border flex items-center justify-center text-[10px] font-bold text-muted-foreground">S</div>
+                    <div>
+                      <p className="text-sm font-bold text-foreground tracking-tight">SLACK_INTEL</p>
+                      <p className="text-[9px] font-medium text-muted-foreground uppercase tracking-widest">STREAM_READY</p>
+                    </div>
+                  </div>
+                  <Button size="sm" variant="outline" type="button" onClick={() => connectService('slack')}>Link</Button>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="p-5 bg-muted/50 border border-border">
-            <p className="text-[10px] text-muted-foreground leading-relaxed font-medium italic">
-              Note: Using <span className="font-bold">Connect Sessions</span>. Authorization is handled via secure temporary tokens.
-            </p>
-          </div>
+            <div className="p-5 bg-muted/50 border border-border">
+              <p className="text-[10px] text-muted-foreground leading-relaxed font-medium italic">
+                Note: Using <span className="font-bold">Connect Sessions</span>. Authorization is handled via secure temporary tokens.
+              </p>
+            </div>
+          </form>
         </Card>
 
         {/* Step 3: Strategic Playbook */}
