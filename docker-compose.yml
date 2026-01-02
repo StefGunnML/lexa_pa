@@ -1,3 +1,4 @@
+# PROJECT COMPASS: TRIGGER BUILD a98b49e
 services:
   backend:
     build: ./backend
