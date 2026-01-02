@@ -19,11 +19,26 @@ class GmailService:
         """
         # 1. Fetch data from Nango (Gmail integration)
         async with httpx.AsyncClient() as client:
+            url = f"https://api.nango.dev/sync/gmail-sync/records?connectionId={connection_id}"
             response = await client.get(
-                f"https://api.nango.dev/sync/gmail-sync/records?connectionId={connection_id}",
-                headers={"Authorization": f"Bearer {self.nango_secret}"}
+                url,
+                headers={
+                    "Authorization": f"Bearer {self.nango_secret}",
+                    "Accept": "application/json"
+                }
             )
-            records = response.json().get("records", [])
+            
+            if response.status_code != 200:
+                print(f"DEBUG: Nango sync error {response.status_code}: {response.text}")
+                return {"status": "error", "code": response.status_code, "text": response.text[:200]}
+                
+            try:
+                data = response.json()
+            except Exception as e:
+                print(f"DEBUG: JSON parse error: {str(e)}")
+                return {"status": "error", "message": "Invalid JSON from Nango", "text": response.text[:200]}
+                
+            records = data.get("records", [])
 
         # 2. Process records into threads and messages
         for record in records:
