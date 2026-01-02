@@ -63,65 +63,63 @@ export default function CommunicationThreads() {
   }, []);
 
   return (
-    <div className="space-y-12">
-      <header className="space-y-4">
+    <div className="space-y-16">
+      <header className="space-y-6">
         <div className="flex items-center gap-2">
-          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">Universal Context</span>
+          <span className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em]">Intelligence Streams</span>
         </div>
-        <h2 className="text-4xl font-light tracking-tight text-slate-100">Inbox</h2>
-        <p className="text-slate-400 text-base max-w-2xl font-light leading-relaxed">
-          Aggregated communication threads across all primary nodes. Each thread maintains a living <span className="text-slate-200">recursive summary</span> for instant strategic recall.
+        <h2 className="text-6xl font-bold tracking-tight text-slate-900">Inbox</h2>
+        <p className="text-slate-500 text-xl max-w-2xl font-normal leading-relaxed">
+          Aggregated communication threads across all nodes. Each thread maintains a living <span className="text-slate-900 font-semibold">recursive summary</span> for strategic recall.
         </p>
       </header>
 
       {loading ? (
-        <div className="flex flex-col items-center justify-center p-24 gap-4">
-          <div className="w-6 h-6 border-t-2 border-slate-400 rounded-full animate-spin"></div>
-          <p className="text-[10px] font-medium text-slate-500 uppercase tracking-widest italic">Recalling Threads</p>
+        <div className="flex flex-col items-center justify-center p-32 gap-6">
+          <div className="w-10 h-10 border-t-2 border-slate-900 rounded-full animate-spin"></div>
+          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em]">Recalling Threads</p>
         </div>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-8">
           {threads.map(thread => (
-            <Link key={thread.id} href={`/dashboard/threads/${thread.id}`} className="block">
-              <Card className="group border-slate-800/40 cursor-pointer transition-all hover:border-slate-600/50">
-                <div className="flex flex-col gap-6">
+            <Link key={thread.id} href={`/dashboard/threads/${thread.id}`} className="block group">
+              <Card className="hover:shadow-[0_20px_50px_rgba(0,0,0,0.06)] border-slate-200/60 transition-all duration-500 p-10">
+                <div className="flex flex-col gap-8">
                   <div className="flex items-start justify-between">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-3">
-                        <Badge variant="default">{thread.source}</Badge>
-                        <h3 className="text-xl font-medium text-slate-200 group-hover:text-white transition-colors tracking-tight italic-mercury">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-4">
+                        <Badge variant="default" className="font-bold">{thread.source}</Badge>
+                        <h3 className="text-2xl font-bold text-slate-900 group-hover:text-black tracking-tight transition-colors">
                           {thread.title}
                         </h3>
                       </div>
-                      <p className="text-[10px] text-slate-500 uppercase tracking-widest font-medium">
+                      <p className="text-[11px] text-slate-400 uppercase tracking-widest font-bold">
                         Last update: {new Date(thread.last_updated).toLocaleString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' })}
                       </p>
                     </div>
-                    <div className="w-8 h-8 rounded-full border border-slate-800 flex items-center justify-center group-hover:border-slate-500 group-hover:bg-slate-800/50 transition-all">
-                      <span className="text-slate-400 group-hover:text-white text-xs">→</span>
+                    <div className="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center group-hover:bg-[#0f172a] group-hover:text-white group-hover:border-[#0f172a] transition-all duration-300">
+                      <span className="text-lg">→</span>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6 border-t border-slate-800/30">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-12 pt-8 border-t border-slate-100">
                     <div className="space-y-4">
-                      <div className="flex items-center gap-2 opacity-60 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                        <div className="w-1 h-1 rounded-full bg-slate-400"></div>
+                      <div className="flex items-center gap-3 text-[10px] font-black text-slate-400 uppercase tracking-widest">
                         Strategic Context
                       </div>
-                      <p className="text-sm font-light text-slate-300 leading-relaxed italic-mercury">
+                      <p className="text-base text-slate-600 leading-relaxed italic-mercury">
                         "{thread.rolling_summary.strategic_context}"
                       </p>
                     </div>
 
                     <div className="space-y-4">
-                      <div className="flex items-center gap-2 opacity-60 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                        <div className="w-1 h-1 rounded-full bg-slate-400"></div>
+                      <div className="flex items-center gap-3 text-[10px] font-black text-slate-400 uppercase tracking-widest">
                         Pending Logic
                       </div>
-                      <ul className="space-y-2">
+                      <ul className="space-y-3">
                         {thread.rolling_summary.pending_tasks.map((task: string, i: number) => (
-                          <li key={i} className="text-xs font-light text-slate-500 flex items-center gap-2">
-                            <span className="w-1 h-1 rounded-full bg-slate-700"></span>
+                          <li key={i} className="text-sm font-medium text-slate-500 flex items-start gap-3">
+                            <span className="w-1.5 h-1.5 rounded-full bg-slate-200 mt-1.5 shrink-0"></span>
                             {task}
                           </li>
                         ))}
@@ -135,5 +133,7 @@ export default function CommunicationThreads() {
         </div>
       )}
     </div>
+  );
+}
   );
 }

@@ -3,55 +3,53 @@
 @tailwind utilities;
 
 :root {
-  --background: 0 0% 2%; /* Absolute Obsidian #050505 */
-  --foreground: 210 20% 98%;
-  --card: 0 0% 4%;
-  --card-foreground: 210 20% 98%;
-  --border: 0 0% 12%;
-  --primary: 210 20% 98%;
-  --primary-foreground: 0 0% 2%;
-  --accent: 0 0% 20%;
-  --accent-foreground: 210 20% 98%;
-  --muted: 0 0% 8%;
-  --muted-foreground: 215 15% 90%; /* Higher contrast for skimmability */
+  --background: 0 0% 100%; /* Pure Paper White */
+  --foreground: 222 47% 11%; /* Charcoal Ink #0f172a */
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+  --border: 214 32% 91%; /* Soft Pearl Border */
+  --primary: 222 47% 11%;
+  --primary-foreground: 210 40% 98%;
+  --accent: 210 40% 96%;
+  --accent-foreground: 222 47% 11%;
+  --muted: 210 40% 96%;
+  --muted-foreground: 215 16% 47%; /* Sophisticated Gray */
 }
 
 @layer base {
   body {
-    @apply bg-[#050505] text-[#f8fafc] antialiased;
-    background-image: radial-gradient(circle at 50% -20%, rgba(255, 255, 255, 0.03), transparent);
+    @apply bg-[#f8fafc] text-[#0f172a] antialiased;
+    background-image: radial-gradient(circle at 50% 0%, #ffffff, transparent);
   }
 }
 
 .luxury-card {
-  @apply bg-white/[0.02] border border-white/[0.08] backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)];
-  box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.05);
+  @apply bg-white border border-slate-200/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] backdrop-blur-sm transition-all duration-300;
 }
 
 .mercury-border {
-  @apply border border-white/[0.05];
+  @apply border border-slate-200;
 }
 
 .text-mercury-muted {
-  @apply text-slate-300 font-normal;
+  @apply text-slate-500 font-normal;
 }
 
 .italic-mercury {
-  @apply font-medium text-white tracking-tight;
-  font-size: 1.15em;
-  line-height: 1.7;
+  @apply font-medium text-slate-800 tracking-tight;
+  font-size: 1.1em;
+  line-height: 1.6;
 }
 
 .high-focus-title {
-  @apply text-white font-bold tracking-tighter;
-  text-shadow: 0 0 40px rgba(255,255,255,0.1);
+  @apply text-slate-900 font-bold tracking-tight;
 }
 
 @keyframes breathe {
-  0%, 100% { opacity: 1; transform: scale(1); filter: brightness(1); }
-  50% { opacity: 0.8; transform: scale(0.995); filter: brightness(1.2); }
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.02); opacity: 0.9; }
 }
 
 .animate-breathe {
-  animation: breathe 3s ease-in-out infinite;
+  animation: breathe 4s ease-in-out infinite;
 }

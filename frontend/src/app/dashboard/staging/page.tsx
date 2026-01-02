@@ -71,53 +71,48 @@ export default function StagingArea() {
   };
 
   return (
-    <div className="space-y-20">
-      <header className="space-y-6">
+    <div className="space-y-24 pb-20">
+      <header className="space-y-8">
         <div className="flex items-center gap-2">
-          <span className="text-[11px] font-black text-slate-500 uppercase tracking-[0.3em]">Operational Briefing</span>
+          <span className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em]">Operational Context</span>
         </div>
-        <h2 className="text-5xl font-bold tracking-tighter text-white">Staging Area</h2>
-        <p className="text-xl text-slate-400 max-w-3xl font-normal leading-relaxed">
-          Intelligence synthesized from your primary nodes. Review and authorize strategic actions proposed by your <span className="text-white font-semibold">AI Chief of Staff</span>.
+        <h2 className="text-6xl font-bold tracking-tight text-slate-900">Staging Area</h2>
+        <p className="text-slate-500 text-xl max-w-2xl font-normal leading-relaxed">
+          Intelligence synthesized from your primary nodes. Review and authorize <span className="text-slate-900 font-semibold">strategic actions</span> proposed by your AI Chief of Staff.
         </p>
       </header>
 
       {loading ? (
         <div className="flex flex-col items-center justify-center p-32 gap-6">
-          <div className="w-10 h-10 border-t-2 border-white rounded-full animate-spin"></div>
-          <p className="text-[11px] font-bold text-slate-500 uppercase tracking-[0.2em]">Synchronizing State</p>
+          <div className="w-10 h-10 border-t-2 border-slate-900 rounded-full animate-spin"></div>
+          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em]">Synchronizing State</p>
         </div>
       ) : (
-        <div className="space-y-16">
+        <div className="space-y-12">
           {actions.length === 0 ? (
-            <div className="text-center p-32 border-2 border-dashed border-slate-800 rounded-3xl">
-              <p className="text-slate-600 text-sm uppercase tracking-[0.3em] font-bold">No Pending Actions</p>
+            <div className="text-center p-32 border border-slate-200 bg-slate-50/50 rounded-3xl">
+              <p className="text-slate-400 text-sm uppercase tracking-[0.4em] font-bold">No Pending Actions</p>
             </div>
           ) : (
             actions.map(action => (
-              <Card key={action.id} className="group border-slate-800/60 hover:border-slate-700 transition-all p-10">
-                <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-12">
-                  <div className="flex-1 space-y-10">
-                    <div className="flex flex-wrap items-center gap-8">
-                      <Badge variant={action.type === 'merge_profiles' ? 'warning' : 'default'} className="px-4 py-1.5 text-[10px] tracking-[0.15em]">
+              <Card key={action.id} className="group hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] transition-all duration-500 border-slate-200/60">
+                <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-16">
+                  <div className="flex-1 space-y-12">
+                    <div className="flex flex-wrap items-center gap-10">
+                      <Badge variant={action.type === 'merge_profiles' ? 'warning' : 'default'} className="px-4 py-1.5 font-bold">
                         {action.type.replace('_', ' ')}
                       </Badge>
                       
-                      {/* Reliability Layer: High Visibility */}
-                      <div className="flex items-center gap-6">
+                      <div className="flex items-center gap-8">
                         {action.confidence_score >= 0.85 ? (
-                          <div className="flex items-center gap-2 text-emerald-400 font-bold text-[10px] uppercase tracking-wider">
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                            </svg>
-                            Verified Intelligence
+                          <div className="flex items-center gap-3 text-emerald-600 font-bold text-[10px] uppercase tracking-widest">
+                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+                            Verified Intel
                           </div>
                         ) : (
-                          <div className="flex items-center gap-2 text-amber-500 font-bold text-[10px] uppercase tracking-wider">
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                            </svg>
-                            Manual Review Suggested
+                          <div className="flex items-center gap-3 text-amber-600 font-bold text-[10px] uppercase tracking-widest">
+                            <div className="w-1.5 h-1.5 rounded-full bg-amber-500"></div>
+                            Review Required
                           </div>
                         )}
 
@@ -126,33 +121,30 @@ export default function StagingArea() {
                             href={action.source_link} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="flex items-center gap-2 text-[10px] font-bold text-slate-500 hover:text-white transition-colors uppercase tracking-widest border-b border-transparent hover:border-white/20 pb-0.5"
+                            className="text-[10px] font-bold text-slate-400 hover:text-slate-900 transition-all uppercase tracking-widest border-b border-transparent hover:border-slate-200 pb-1"
                           >
-                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                            </svg>
-                            Verification Source
+                            Source Link
                           </a>
                         )}
                       </div>
                     </div>
 
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                       {action.type === 'calendar_invite' && (
                         <div className="space-y-4">
-                          <h3 className="text-4xl font-bold text-white tracking-tight leading-tight">{action.data.title}</h3>
-                          <p className="text-xl text-slate-400 font-medium">
+                          <h3 className="text-5xl font-bold text-slate-900 tracking-tight leading-tight">{action.data.title}</h3>
+                          <p className="text-2xl text-slate-500 font-medium tracking-tight">
                             Scheduled for {new Date(action.data.deadline).toLocaleDateString(undefined, { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                           </p>
                         </div>
                       )}
 
                       {action.type === 'merge_profiles' && (
-                        <div className="space-y-6">
-                          <h3 className="text-4xl font-bold text-white tracking-tight leading-tight">Identity Match: {action.data.name}</h3>
-                          <div className="flex flex-wrap gap-4">
+                        <div className="space-y-8">
+                          <h3 className="text-5xl font-bold text-slate-900 tracking-tight leading-tight">Identity Match: {action.data.name}</h3>
+                          <div className="flex flex-wrap gap-5">
                             {action.data.platforms.map((p: string, i: number) => (
-                              <div key={i} className="px-5 py-3 rounded-xl bg-slate-900 border border-slate-800 text-sm font-medium text-slate-300">
+                              <div key={i} className="px-6 py-4 rounded-2xl bg-slate-50 border border-slate-200 text-base font-bold text-slate-600 tracking-tight">
                                 {p}
                               </div>
                             ))}
@@ -161,38 +153,37 @@ export default function StagingArea() {
                       )}
 
                       {action.type === 'email_draft' && (
-                        <div className="space-y-8">
-                          <div className="space-y-2">
-                            <h3 className="text-4xl font-bold text-white tracking-tight leading-tight">{action.data.subject}</h3>
-                            <p className="text-lg text-slate-400 font-medium italic">Recipient: {action.data.to}</p>
+                        <div className="space-y-10">
+                          <div className="space-y-3">
+                            <h3 className="text-5xl font-bold text-slate-900 tracking-tight leading-tight">{action.data.subject}</h3>
+                            <p className="text-xl text-slate-400 font-medium italic">Recipient: {action.data.to}</p>
                           </div>
-                          <div className="p-10 bg-slate-900/40 rounded-2xl border border-slate-800/50 text-lg leading-relaxed text-slate-200 italic-mercury shadow-inner">
+                          <div className="p-12 bg-slate-50/50 rounded-3xl border border-slate-200/60 text-xl leading-relaxed text-slate-700 italic shadow-inner">
                             "{action.data.body}"
                           </div>
                         </div>
                       )}
                     </div>
 
-                    <div className="p-8 bg-slate-800/20 rounded-2xl border-l-4 border-slate-700/50 space-y-4">
-                      <div className="flex items-center gap-3 opacity-80">
-                        <div className="w-1.5 h-1.5 rounded-full bg-slate-400"></div>
-                        <span className="text-[11px] font-black text-slate-500 uppercase tracking-[0.3em]">Strategic Logic</span>
+                    <div className="p-10 bg-slate-50 rounded-3xl border-l-4 border-slate-200 space-y-5">
+                      <div className="flex items-center gap-4 opacity-60">
+                        <span className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em]">Strategic Logic</span>
                       </div>
-                      <p className="text-md font-medium text-slate-300 leading-relaxed italic-mercury">
+                      <p className="text-lg font-medium text-slate-600 leading-relaxed italic">
                         {action.data.reasoning || "Contextual analysis of recent communication streams and session commitments."}
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex flex-row lg:flex-col gap-4 min-w-[180px]">
-                    <Button onClick={() => handleAction(action.id, 'approved')} variant="primary" className="flex-1 py-6 text-sm font-bold tracking-wide">
-                      Confirm
+                  <div className="flex flex-row lg:flex-col gap-5 min-w-[200px]">
+                    <Button onClick={() => handleAction(action.id, 'approved')} variant="primary" className="flex-1 py-8 shadow-xl">
+                      COMMIT
                     </Button>
-                    <Button onClick={() => {}} variant="outline" className="flex-1 py-6 text-sm font-bold tracking-wide">
-                      Adjust
+                    <Button onClick={() => {}} variant="secondary" className="flex-1 py-8">
+                      ADJUST
                     </Button>
-                    <Button onClick={() => handleAction(action.id, 'rejected')} variant="destructive" className="flex-1 py-6 text-sm font-bold tracking-wide opacity-60 hover:opacity-100">
-                      Archive
+                    <Button onClick={() => handleAction(action.id, 'rejected')} variant="destructive" className="flex-1 py-8 opacity-60 hover:opacity-100">
+                      ARCHIVE
                     </Button>
                   </div>
                 </div>

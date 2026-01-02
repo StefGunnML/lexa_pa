@@ -38,61 +38,59 @@ export default function MeetingsSession() {
   }, []);
 
   return (
-    <div className="space-y-12">
-      <header className="space-y-4">
+    <div className="space-y-16">
+      <header className="space-y-6">
         <div className="flex items-center gap-2">
-          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">Live Intelligence</span>
+          <span className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em]">Post-Session Intel</span>
         </div>
-        <h2 className="text-4xl font-light tracking-tight text-slate-100">Session</h2>
-        <p className="text-slate-400 text-base max-w-2xl font-light leading-relaxed">
-          Post-session intelligence and real-time positioning history. Review <span className="text-slate-200">action items</span> and strategic nudges from your meetings.
+        <h2 className="text-6xl font-bold tracking-tight text-slate-900">Session</h2>
+        <p className="text-slate-500 text-xl max-w-2xl font-normal leading-relaxed">
+          Historical positioning intelligence and extracted commitments. Review the <span className="text-slate-900 font-semibold">strategic shifts</span> from your past meetings.
         </p>
       </header>
 
       {loading ? (
-        <div className="flex flex-col items-center justify-center p-24 gap-4">
-          <div className="w-6 h-6 border-t-2 border-slate-400 rounded-full animate-spin"></div>
-          <p className="text-[10px] font-medium text-slate-500 uppercase tracking-widest italic">Analyzing Sessions</p>
+        <div className="flex flex-col items-center justify-center p-32 gap-6">
+          <div className="w-10 h-10 border-t-2 border-slate-900 rounded-full animate-spin"></div>
+          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em]">Analyzing Sessions</p>
         </div>
       ) : (
         <div className="space-y-8">
           {meetings.map(meeting => (
-            <Card key={meeting.id} className="border-slate-800/40">
-              <div className="flex flex-col md:flex-row justify-between gap-10">
-                <div className="flex-1 space-y-8">
+            <Card key={meeting.id} className="hover:shadow-[0_20px_50px_rgba(0,0,0,0.06)] border-slate-200/60 transition-all duration-500 p-10">
+              <div className="flex flex-col md:flex-row justify-between gap-16">
+                <div className="flex-1 space-y-10">
                   <div className="space-y-2">
                     <div className="flex items-center gap-4">
-                      <Badge variant="success">Session Log</Badge>
-                      <span className="text-[9px] font-medium text-slate-600 uppercase tracking-[0.15em]">
+                      <Badge variant="success" className="font-bold">Session Log</Badge>
+                      <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
                         {new Date(meeting.start_time).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}
                       </span>
                     </div>
-                    <h3 className="text-2xl font-medium text-slate-200 tracking-tight">{meeting.title}</h3>
+                    <h3 className="text-3xl font-bold text-slate-900 tracking-tight">{meeting.title}</h3>
                   </div>
 
                   <div className="space-y-4">
-                    <div className="flex items-center gap-3 opacity-60">
-                      <div className="w-1 h-1 rounded-full bg-slate-400"></div>
-                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Strategic Positioning</span>
+                    <div className="flex items-center gap-3 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                      Strategic Positioning
                     </div>
-                    <div className="p-6 bg-slate-900/30 rounded-xl border border-slate-800/30">
-                      <p className="text-sm font-light text-slate-300 leading-relaxed italic-mercury">
+                    <div className="p-8 bg-slate-50 border border-slate-100 rounded-2xl">
+                      <p className="text-base text-slate-600 leading-relaxed italic-mercury">
                         "{meeting.positioning_notes}"
                       </p>
                     </div>
                   </div>
                 </div>
 
-                <div className="w-full md:w-64 space-y-6">
-                  <div className="flex items-center gap-3 opacity-60">
-                    <div className="w-1 h-1 rounded-full bg-slate-400"></div>
-                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Commitments</span>
+                <div className="w-full md:w-72 space-y-6">
+                  <div className="flex items-center gap-3 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                    Commitments
                   </div>
-                  <ul className="space-y-3">
+                  <ul className="space-y-4">
                     {meeting.action_items.map((item, i) => (
-                      <li key={i} className="flex items-start gap-3">
-                        <div className="mt-1.5 w-1.5 h-1.5 rounded-full border border-slate-600 flex-shrink-0"></div>
-                        <span className="text-xs font-light text-slate-400 leading-tight tracking-wide">{item}</span>
+                      <li key={i} className="flex items-start gap-4">
+                        <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-slate-200 shrink-0"></div>
+                        <span className="text-sm font-medium text-slate-500 leading-snug">{item}</span>
                       </li>
                     ))}
                   </ul>
@@ -103,6 +101,8 @@ export default function MeetingsSession() {
         </div>
       )}
     </div>
+  );
+}
   );
 }
 

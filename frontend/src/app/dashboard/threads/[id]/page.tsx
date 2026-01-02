@@ -10,42 +10,41 @@ export default function ThreadDetail() {
   const id = params.id as string;
 
   return (
-    <div className="space-y-12">
-      <header className="space-y-4">
+    <div className="space-y-16">
+      <header className="space-y-6">
         <div className="flex items-center gap-4">
-          <Link href="/dashboard/threads" className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] hover:text-white transition-colors">
+          <Link href="/dashboard/threads" className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em] hover:text-[#0f172a] transition-colors">
             ← Back to Inbox
           </Link>
         </div>
         <div className="flex items-center justify-between">
-          <h2 className="text-4xl font-light tracking-tight text-slate-100 italic-mercury">Thread Details: {id}</h2>
-          <Badge variant="success">Active Intelligence</Badge>
+          <h2 className="text-5xl font-bold tracking-tight text-slate-900">Thread Context</h2>
+          <Badge variant="success" className="font-bold">Active Intel</Badge>
         </div>
       </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-        <div className="lg:col-span-2 space-y-8">
-          <Card className="border-slate-800/40">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
+        <div className="lg:col-span-2 space-y-12">
+          <Card className="border-slate-200/60 shadow-[0_20px_50px_rgba(0,0,0,0.04)]">
             <div className="space-y-6">
-              <div className="flex items-center gap-3 opacity-60">
-                <div className="w-1 h-1 rounded-full bg-slate-400"></div>
-                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Rolling Summary (DeepSeek 70B)</span>
+              <div className="flex items-center gap-3 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                Rolling Summary (DeepSeek 70B)
               </div>
-              <p className="text-lg font-light text-slate-300 leading-relaxed italic-mercury">
+              <p className="text-xl text-slate-700 leading-relaxed italic-mercury">
                 "The conversation is currently centered around final term sheet adjustments. The counterparty is pushing for a 20% discount, which conflicts with our core strategy. Tactical advice is to pivot to ROI."
               </p>
             </div>
           </Card>
 
-          <div className="space-y-6">
-            <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-widest ml-1">Message History</h4>
+          <div className="space-y-8">
+            <h4 className="text-sm font-black text-slate-400 uppercase tracking-widest ml-1">Message History</h4>
             {[1, 2].map((m) => (
-              <div key={m} className="p-6 rounded-xl border border-slate-800/40 bg-slate-900/20">
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-xs font-medium text-slate-400 italic-mercury">Counterparty Name</span>
-                  <span className="text-[9px] text-slate-600 uppercase tracking-widest">2 hours ago</span>
+              <div key={m} className="p-8 rounded-2xl border border-slate-100 bg-white shadow-sm">
+                <div className="flex items-center justify-between mb-6">
+                  <span className="text-sm font-bold text-slate-900">Counterparty Name</span>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">2 hours ago</span>
                 </div>
-                <p className="text-sm font-light text-slate-400 leading-relaxed">
+                <p className="text-base text-slate-600 leading-relaxed">
                   "Hi, we've reviewed the numbers. If we can get a 20% discount on the seat license, we're ready to sign the full team by Friday."
                 </p>
               </div>
@@ -53,30 +52,32 @@ export default function ThreadDetail() {
           </div>
         </div>
 
-        <div className="space-y-8">
-          <div className="space-y-4">
-            <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-widest ml-1">Strategic Leverage</h4>
-            <Card className="bg-amber-900/5 border-amber-900/20">
-              <ul className="space-y-4">
-                <li className="text-xs text-amber-200/70 font-light leading-relaxed italic-mercury">
+        <div className="space-y-12">
+          <div className="space-y-6">
+            <h4 className="text-sm font-black text-slate-400 uppercase tracking-widest ml-1">Strategic Leverage</h4>
+            <Card className="bg-amber-50 border-amber-100 shadow-none">
+              <ul className="space-y-6">
+                <li className="text-sm text-amber-800 font-medium leading-relaxed italic-mercury">
                   • They previously agreed to premium pricing for 2-week delivery.
                 </li>
-                <li className="text-xs text-amber-200/70 font-light leading-relaxed italic-mercury">
+                <li className="text-sm text-amber-800 font-medium leading-relaxed italic-mercury">
                   • Budget cycle ends this week; they are under pressure to deploy.
                 </li>
               </ul>
             </Card>
           </div>
 
-          <div className="space-y-4">
-            <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-widest ml-1">Actions</h4>
-            <div className="flex flex-col gap-3">
-              <Button variant="primary">Draft Reply (AI)</Button>
-              <Button variant="outline">Log Commitment</Button>
+          <div className="space-y-6">
+            <h4 className="text-sm font-black text-slate-400 uppercase tracking-widest ml-1">Command Actions</h4>
+            <div className="flex flex-col gap-4">
+              <Button variant="primary" className="py-6 shadow-xl">Draft Reply (AI)</Button>
+              <Button variant="secondary" className="py-6">Log Commitment</Button>
             </div>
           </div>
         </div>
       </div>
     </div>
+  );
+}
   );
 }
