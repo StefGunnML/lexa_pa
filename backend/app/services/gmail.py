@@ -32,6 +32,7 @@ class GmailService:
                 print(f"DEBUG: Nango sync error {response.status_code}: {response.text}")
                 return {"status": "error", "code": response.status_code, "text": response.text[:200]}
                 
+            print(f"DEBUG: Nango RAW Response: {response.text[:500]}")
             try:
                 data = response.json()
             except Exception as e:
