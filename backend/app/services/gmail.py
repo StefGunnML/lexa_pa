@@ -42,14 +42,17 @@ class GmailService:
                     pass
 
         if not records:
+            print(f"DEBUG: No records found for model {model} using both v1 and v2")
             return {"status": "no_records_found", "tried_model": model}
 
         # 2. Process records into threads and messages
+        print(f"DEBUG: Found {len(records)} records for model {model}. First record: {str(records[0])[:500]}")
         count = 0
         for record in records:
             try:
+                # Nango standard Gmail fields often use 'id', 'body', 'subject'
                 thread_id = record.get("threadId") or record.get("id")
-                message_body = record.get("body") or record.get("text") or ""
+                message_body = record.get("body") or record.get("text") or record.get("snippet") or ""
                 
                 # Check if thread exists, else create
                 thread = self.db.query(Thread).filter(Thread.id == thread_id).first()

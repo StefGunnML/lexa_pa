@@ -138,7 +138,7 @@ async def manual_nango_sync():
             if "google-mail" in platform:
                 service = GmailService(db)
                 # Try multiple possible model names for Gmail
-                for model in ["Message", "Thread", "gmail-sync"]:
+                for model in ["Message", "Thread", "gmail-sync", "emails", "google-mail"]:
                     res = await service.sync_gmail_threads(cid, model=model)
                     results.append({"platform": platform, "model": model, "result": res})
             elif "slack" in platform:

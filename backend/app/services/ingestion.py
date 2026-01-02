@@ -25,7 +25,7 @@ async def process_ingestion(audit_log_id: str):
         platform = audit_entry.source_platform
         
         # Determine service based on platform
-        if "google-gmail" in platform or "gmail" in platform:
+        if any(x in platform for x in ["google-gmail", "gmail", "google-mail"]):
             service = GmailService(db)
             await service.sync_gmail_threads(connection_id)
         elif "slack" in platform:
