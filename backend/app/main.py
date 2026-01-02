@@ -133,6 +133,17 @@ async def debug_nango_db():
         "config_keys": [c.key for c in configs]
     }
 
+@app.get("/nango/debug-sync-list")
+async def debug_nango_sync_list():
+    db = SessionLocal()
+    nango_secret_entry = db.query(SystemConfig).filter(SystemConfig.key == "NANGO_SECRET_KEY").first()
+    db.close()
+    nango_secret = nango_secret_entry.value if nango_secret_entry else os.getenv("NANGO_SECRET_KEY")
+    
+    async with httpx.AsyncClient() as client:
+        res = await client.get("https://api.nango.dev/sync-configs", headers={"Authorization": f"Bearer {nango_secret}", "Accept": "application/json"})
+        return res.json()
+
 @app.get("/nango/debug-connections")
 async def debug_nango_connections():
     db = SessionLocal()
@@ -158,10 +169,11 @@ async def debug_nango_records():
             return {"error": "No connections found"}
         
         cid = conns[0]["connection_id"]
-        sync_ids = ["gmail-sync", "slack-messages"]
+        sync_ids = ["Message", "Thread", "gmail-sync", "slack-messages"]
         results = {}
         for sid in sync_ids:
-            res = await client.get(f"https://api.nango.dev/sync/{sid}/records?connectionId={cid}", headers={"Authorization": f"Bearer {nango_secret}"})
+            url = f"https://api.nango.dev/records?model={sid}&connectionId={cid}"
+            res = await client.get(url, headers={"Authorization": f"Bearer {nango_secret}", "Accept": "application/json"})
             results[sid] = {
                 "status": res.status_code,
                 "data": res.json() if res.status_code == 200 else res.text[:200]
@@ -192,8 +204,10 @@ async def manual_nango_sync():
             
             if "google-mail" in platform:
                 service = GmailService(db)
-                res = await service.sync_gmail_threads(cid)
-                results.append({"platform": platform, "result": res})
+                # Try with common v2 model names
+                for model in ["Message", "Thread"]:
+                    res = await service.sync_gmail_threads(cid, model=model)
+                    results.append({"platform": platform, "model": model, "result": res})
             elif "slack" in platform:
                 service = SlackService(db)
                 res = await service.sync_slack_messages(cid)

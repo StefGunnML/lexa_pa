@@ -13,14 +13,14 @@ class GmailService:
         self.agent = CompassAgent()
         self.db = db_session
 
-    async def sync_gmail_threads(self, connection_id: str):
+    async def sync_gmail_threads(self, connection_id: str, model: str = "gmail-sync"):
         """
         Sync threads from Gmail via Nango.
         """
         # 1. Fetch data from Nango (Gmail integration)
         async with httpx.AsyncClient() as client:
             # CORRECT V2 ENDPOINT: /records?model={sync_id}&connectionId={cid}
-            url = f"https://api.nango.dev/records?model=gmail-sync&connectionId={connection_id}"
+            url = f"https://api.nango.dev/records?model={model}&connectionId={connection_id}"
             response = await client.get(
                 url,
                 headers={
