@@ -84,10 +84,16 @@ export default function SettingsPage() {
   };
 
   const connectService = async (provider: string) => {
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/b4de5701-9876-47ce-aad5-7d358d247a66',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'settings.tsx:86',message:'connectService called',data:{provider},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+    // #endregion
     try {
       console.log(`[Compass] Initiating connect for ${provider}...`);
       
       // 1. Get a session token from our backend (specify which provider we want)
+      // #region agent log
+      fetch('http://127.0.0.1:7243/ingest/b4de5701-9876-47ce-aad5-7d358d247a66',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'settings.tsx:91',message:'Requesting session token',data:{provider},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+      // #endregion
       const sessionRes = await fetch('/api/nango/session', { 
         method: 'POST',
         headers: { 
@@ -98,38 +104,82 @@ export default function SettingsPage() {
       });
       
       const sessionData = await sessionRes.json();
+      // #region agent log
+      fetch('http://127.0.0.1:7243/ingest/b4de5701-9876-47ce-aad5-7d358d247a66',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'settings.tsx:100',message:'Backend response received',data:{hasToken:!!sessionData.token,hasError:!!sessionData.error,error:sessionData.error,tokenLength:sessionData.token?.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+      // #endregion
       console.log(`[Compass] Backend Response:`, sessionData);
 
       if (sessionData.error) {
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/b4de5701-9876-47ce-aad5-7d358d247a66',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'settings.tsx:103',message:'Backend returned error',data:{error:sessionData.error,detail:sessionData.detail},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+        // #endregion
         alert(`Integration Error: ${sessionData.error}\nDetail: ${JSON.stringify(sessionData.detail)}`);
         return;
       }
 
       if (!sessionData.token) {
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/b4de5701-9876-47ce-aad5-7d358d247a66',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'settings.tsx:108',message:'No token in response',data:{sessionData},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+        // #endregion
         alert("Critical Error: No session token received from backend. Check browser console.");
         console.error("[Compass] Missing token in payload:", sessionData);
         return;
       }
 
+      console.log(`[Compass] Token received (length: ${sessionData.token.length})`);
+
       // 2. Initialize Nango
+      // #region agent log
+      fetch('http://127.0.0.1:7243/ingest/b4de5701-9876-47ce-aad5-7d358d247a66',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'settings.tsx:115',message:'Initializing Nango SDK',data:{tokenLength:sessionData.token.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'})}).catch(()=>{});
+      // #endregion
       const nango = new Nango();
       
-      // 3. Open the Connect UI with the provider specified
+      // 3. Open the Connect UI (provider is already scoped in the session token)
+      // #region agent log
+      fetch('http://127.0.0.1:7243/ingest/b4de5701-9876-47ce-aad5-7d358d247a66',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'settings.tsx:120',message:'Opening Connect UI',data:{provider},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'G'})}).catch(()=>{});
+      // #endregion
+      console.log(`[Compass] Opening Connect UI...`);
       const connect = nango.openConnectUI({
-        providerConfigKey: provider, // This tells Nango which integration to show
         onEvent: (event) => {
+          // #region agent log
+          fetch('http://127.0.0.1:7243/ingest/b4de5701-9876-47ce-aad5-7d358d247a66',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'settings.tsx:123',message:'Nango event received',data:{eventType:event.type,eventData:event.data},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H'})}).catch(()=>{});
+          // #endregion
           console.log(`[Compass] Nango Event:`, event.type, event.data);
           if (event.type === 'connect') {
             alert(`Successfully connected to ${provider}!`);
+          } else if (event.type === 'error') {
+            alert(`Nango Error: ${JSON.stringify(event.data)}`);
+          } else if (event.type === 'close') {
+            console.log(`[Compass] Modal closed by user`);
           }
         },
       });
 
-      // 4. Provide the token
-      console.log(`[Compass] Injecting token into Nango modal...`);
+      // 4. Provide the token (this tells Nango which provider to show based on allowed_integrations)
+      // #region agent log
+      fetch('http://127.0.0.1:7243/ingest/b4de5701-9876-47ce-aad5-7d358d247a66',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'settings.tsx:135',message:'Setting session token',data:{provider,tokenPrefix:sessionData.token.substring(0,10)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'I'})}).catch(()=>{});
+      // #endregion
+      console.log(`[Compass] Setting session token (provider: ${provider})...`);
       connect.setSessionToken(sessionData.token);
       
-    } catch (err) {
+      // 5. Timeout check - if modal stays grey for 10 seconds, something is wrong
+      setTimeout(() => {
+        const modal = document.querySelector('[data-nango-modal]') || document.querySelector('.nango-modal') || document.querySelector('iframe');
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/b4de5701-9876-47ce-aad5-7d358d247a66',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'settings.tsx:142',message:'Timeout check - modal state',data:{modalFound:!!modal,modalTag:modal?.tagName},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'J'})}).catch(()=>{});
+        // #endregion
+        if (modal) {
+          console.log(`[Compass] Modal detected after 10s, checking if loaded...`);
+        } else {
+          console.warn(`[Compass] No modal detected after 10s - Nango might not have initialized`);
+          alert(`Modal timeout: The authorization window may not be loading. Check console for details.`);
+        }
+      }, 10000);
+      
+    } catch (err: any) {
+      // #region agent log
+      fetch('http://127.0.0.1:7243/ingest/b4de5701-9876-47ce-aad5-7d358d247a66',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'settings.tsx:150',message:'Exception caught',data:{error:err?.message,stack:err?.stack},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'K'})}).catch(()=>{});
+      // #endregion
       console.error(`[Compass] Frontend Crash:`, err);
       alert(`Frontend Error: ${String(err)}`);
     }
@@ -141,7 +191,7 @@ export default function SettingsPage() {
         <div className="flex items-center gap-3">
           <span className="system-label">CALIBRATION: NODE_01</span>
           <span className="system-label">ENCRYPTION: AES-256</span>
-          <span className="system-label bg-red-100 text-red-600 font-bold border-red-200 uppercase">BUILD: NANGO_V3_FIX</span>
+          <span className="system-label bg-red-100 text-red-600 font-bold border-red-200 uppercase">BUILD: DEBUG_V4</span>
         </div>
         <h2 className="text-5xl font-bold tracking-tighter text-foreground">System Command</h2>
         <p className="text-muted-foreground text-xl max-w-2xl font-medium leading-relaxed">
@@ -239,7 +289,7 @@ export default function SettingsPage() {
                       <p className="text-[9px] font-medium text-muted-foreground uppercase tracking-widest">SYNC_READY</p>
                     </div>
                   </div>
-                  <Button size="sm" variant="outline" type="button" onClick={() => connectService('google-gmail')}>Link</Button>
+                  <Button size="sm" variant="outline" type="button" onClick={() => connectService('google')}>Link</Button>
                 </div>
 
                 <div className="p-5 bg-muted border border-border flex items-center justify-between hover:border-foreground/20 transition-all group">

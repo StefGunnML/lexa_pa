@@ -98,8 +98,17 @@ async def create_nango_session(request: Request):
     Creates a Nango Connect Session token.
     Accepts 'provider' in request body to specify which integration to allow.
     """
+    import json
+    import time
+    log_path = "/Users/stefangunnarsson/Dropbox/Lexa PA/lexa_pa/.cursor/debug.log"
+    
     body = await request.json()
     provider = body.get("provider", "google-gmail")  # Default to Gmail
+    
+    # #region agent log
+    with open(log_path, "a") as f:
+        f.write(json.dumps({"location":"main.py:101","message":"Session request received","data":{"provider":provider},"timestamp":int(time.time()*1000),"sessionId":"debug-session","runId":"run1","hypothesisId":"L"})+"\n")
+    # #endregion
     
     db = SessionLocal()
     nango_secret_entry = db.query(SystemConfig).filter(SystemConfig.key == "NANGO_SECRET_KEY").first()
@@ -108,6 +117,10 @@ async def create_nango_session(request: Request):
     nango_secret = nango_secret_entry.value if nango_secret_entry else os.getenv("NANGO_SECRET_KEY")
 
     if not nango_secret:
+        # #region agent log
+        with open(log_path, "a") as f:
+            f.write(json.dumps({"location":"main.py:110","message":"NANGO_SECRET_KEY missing","data":{},"timestamp":int(time.time()*1000),"sessionId":"debug-session","runId":"run1","hypothesisId":"M"})+"\n")
+        # #endregion
         return {
             "error": "NANGO_SECRET_KEY_MISSING",
             "detail": "NANGO_SECRET_KEY not found in database (system_config) or environment variables.",
@@ -116,6 +129,10 @@ async def create_nango_session(request: Request):
     
     async with httpx.AsyncClient() as client:
         try:
+            # #region agent log
+            with open(log_path, "a") as f:
+                f.write(json.dumps({"location":"main.py:118","message":"Calling Nango API","data":{"provider":provider,"secretPrefix":nango_secret[:10] if nango_secret else None},"timestamp":int(time.time()*1000),"sessionId":"debug-session","runId":"run1","hypothesisId":"N"})+"\n")
+            # #endregion
             response = await client.post(
                 "https://api.nango.dev/connect/sessions",
                 headers={
@@ -133,15 +150,31 @@ async def create_nango_session(request: Request):
             )
             
             data = response.json()
+            # #region agent log
+            with open(log_path, "a") as f:
+                f.write(json.dumps({"location":"main.py:135","message":"Nango API response","data":{"statusCode":response.status_code,"hasToken":"token" in data},"timestamp":int(time.time()*1000),"sessionId":"debug-session","runId":"run1","hypothesisId":"O"})+"\n")
+            # #endregion
             if response.status_code != 200:
+                # #region agent log
+                with open(log_path, "a") as f:
+                    f.write(json.dumps({"location":"main.py:137","message":"Nango API error","data":{"statusCode":response.status_code,"detail":data},"timestamp":int(time.time()*1000),"sessionId":"debug-session","runId":"run1","hypothesisId":"P"})+"\n")
+                # #endregion
                 return {
                     "error": "NANGO_API_ERROR",
                     "status_code": response.status_code,
                     "detail": data
                 }
             
+            # #region agent log
+            with open(log_path, "a") as f:
+                f.write(json.dumps({"location":"main.py:143","message":"Session token created successfully","data":{"tokenLength":len(data.get("token",""))},"timestamp":int(time.time()*1000),"sessionId":"debug-session","runId":"run1","hypothesisId":"Q"})+"\n")
+            # #endregion
             return data
         except Exception as e:
+            # #region agent log
+            with open(log_path, "a") as f:
+                f.write(json.dumps({"location":"main.py:145","message":"Backend exception","data":{"error":str(e)},"timestamp":int(time.time()*1000),"sessionId":"debug-session","runId":"run1","hypothesisId":"R"})+"\n")
+            # #endregion
             return {
                 "error": "BACKEND_EXCEPTION",
                 "detail": str(e)
