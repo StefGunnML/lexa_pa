@@ -9,6 +9,7 @@ export default function SettingsPage() {
   const [config, setConfig] = useState<any>({
     DEEPSEEK_API_BASE: '',
     DEEPSEEK_API_KEY: '',
+    NANGO_SECRET_KEY: '',
   });
 
   // #region agent log
@@ -100,16 +101,32 @@ export default function SettingsPage() {
   };
 
   const connectService = async (provider: string) => {
-    const publicKey = process.env.NEXT_PUBLIC_NANGO_PUBLIC_KEY;
-    if (!publicKey) {
-      console.error("Nango Public Key not set in environment variables.");
-      return;
-    }
-    const nango = new Nango({ publicKey });
     try {
-      const result = await nango.auth(provider, 'stefan-primary');
-      console.log(`Connected to ${provider}`, result);
-      // Trigger backend sync here
+      // 1. Get a session token from our backend
+      const sessionRes = await fetch('/api/nango/session', { method: 'POST' });
+      const sessionData = await sessionRes.json();
+      
+      if (sessionData.error) {
+        console.error("Failed to get Nango session", sessionData.error);
+        return;
+      }
+
+      // 2. Initialize Nango without a public key (uses session token)
+      const nango = new Nango();
+      
+      // 3. Open the Connect UI
+      const connect = nango.openConnectUI({
+        onEvent: (event) => {
+          if (event.type === 'connect') {
+            console.log(`Successfully connected to ${provider}`, event.data);
+            // The connection is now active in Nango
+          }
+        },
+      });
+
+      // 4. Provide the token to start the flow
+      connect.setSessionToken(sessionData.token);
+      
     } catch (err) {
       console.error(`Failed to connect to ${provider}`, err);
     }
@@ -119,25 +136,25 @@ export default function SettingsPage() {
     <div className="space-y-16 pb-20 font-sans">
       <header className="space-y-6">
         <div className="flex items-center gap-3">
-          <span className="system-label">CALIBRATION_NODE</span>
+          <span className="system-label">CALIBRATION: NODE_01</span>
           <span className="system-label">ENCRYPTION: AES-256</span>
         </div>
-        <h2 className="text-6xl font-extrabold tracking-tight text-slate-900">System Command</h2>
-        <p className="text-slate-500 text-xl max-w-2xl font-medium leading-relaxed">
-          Calibrate private reasoning nodes... authenticate <span className="text-blue-600 font-bold">communication_nodes</span>... define strategic guardrails.
+        <h2 className="text-5xl font-bold tracking-tighter text-foreground">System Command</h2>
+        <p className="text-muted-foreground text-xl max-w-2xl font-medium leading-relaxed">
+          Calibrate private reasoning nodes, authenticate communication streams, and define <span className="text-foreground font-bold underline decoration-border decoration-2 underline-offset-4">strategic guardrails</span>.
         </p>
       </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
         {/* Step 1: Reasoning Engine */}
-        <Card className={`space-y-10 ${pulseStatus === 'active' ? 'border-blue-200 bg-blue-50/10' : ''}`}>
+        <Card className="space-y-10">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
-                <Zap size={24} />
+              <div className="p-3 bg-muted text-foreground">
+                <Zap size={20} />
               </div>
-              <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight">Reasoning Node</h3>
+              <h3 className="text-xl font-bold text-foreground tracking-tight">REASONING_NODE</h3>
             </div>
             <Badge variant={pulseStatus === 'active' ? 'success' : pulseStatus === 'error' ? 'warning' : 'default'}>
               {pulseStatus.toUpperCase()}
@@ -146,25 +163,25 @@ export default function SettingsPage() {
 
           <div className="space-y-6">
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">SCALEWAY_IP_ENDPOINT</label>
+              <label className="text-[9px] font-medium text-muted-foreground uppercase tracking-[0.2em]">SCALEWAY_IP_ENDPOINT</label>
               <input 
                 type="text" 
                 value={config.DEEPSEEK_API_BASE || ''}
                 onChange={(e) => setConfig({...config, DEEPSEEK_API_BASE: e.target.value})}
                 onBlur={(e) => saveConfig('DEEPSEEK_API_BASE', e.target.value)}
                 placeholder="0.0.0.0"
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 text-sm text-slate-900 focus:outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-50 transition-all placeholder:text-slate-300 font-mono"
+                className="w-full bg-muted border border-border px-5 py-3 text-sm text-foreground focus:outline-none focus:border-foreground/20 transition-all placeholder:text-muted-foreground/30 font-mono"
               />
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">ACCESS_KEY</label>
+              <label className="text-[9px] font-medium text-muted-foreground uppercase tracking-[0.2em]">ACCESS_KEY</label>
               <input 
                 type="password" 
                 value={config.DEEPSEEK_API_KEY || ''}
                 onChange={(e) => setConfig({...config, DEEPSEEK_API_KEY: e.target.value})}
                 onBlur={(e) => saveConfig('DEEPSEEK_API_KEY', e.target.value)}
                 placeholder="••••••••"
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 text-sm text-slate-900 focus:outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-50 transition-all placeholder:text-slate-300 font-mono"
+                className="w-full bg-muted border border-border px-5 py-3 text-sm text-foreground focus:outline-none focus:border-foreground/20 transition-all placeholder:text-muted-foreground/30 font-mono"
               />
             </div>
           </div>
@@ -172,50 +189,64 @@ export default function SettingsPage() {
           <Button 
             onClick={testPulse} 
             disabled={pulseStatus === 'testing'}
-            className="w-full py-8 text-sm"
-            variant={pulseStatus === 'active' ? 'primary' : 'secondary'}
+            className="w-full"
+            variant="primary"
           >
-            {pulseStatus === 'testing' ? <RefreshCw className="animate-spin" size={18} /> : <Play size={18} />}
-            Initiate Pulse Check
+            {pulseStatus === 'testing' ? <RefreshCw className="animate-spin" size={16} /> : <Play size={16} className="mr-2" />}
+            INITIATE_PULSE_CHECK
           </Button>
         </Card>
 
         {/* Step 2: Communication Nodes */}
         <Card className="space-y-10">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
-              <MessageSquare size={24} />
+            <div className="p-3 bg-muted text-foreground">
+              <MessageSquare size={20} />
             </div>
-            <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight">Comm Nodes</h3>
+            <h3 className="text-xl font-bold text-foreground tracking-tight">COMM_NODES</h3>
           </div>
 
-          <div className="space-y-4">
-            <div className="p-6 bg-slate-50/50 border border-slate-100 rounded-2xl flex items-center justify-between hover:bg-white hover:shadow-sm transition-all group">
-              <div className="flex items-center gap-5">
-                <div className="w-12 h-12 bg-white border border-slate-200 flex items-center justify-center text-sm font-black text-slate-400 rounded-xl shadow-sm">G</div>
-                <div>
-                  <p className="text-base font-bold text-slate-900 tracking-tight">Gmail_INTEL</p>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">SYNC_READY</p>
-                </div>
-              </div>
-              <Button size="sm" variant="outline" onClick={() => connectService('google-gmail')} className="font-bold border-slate-200">Link</Button>
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <label className="text-[9px] font-medium text-muted-foreground uppercase tracking-[0.2em]">NANGO_SECRET_KEY</label>
+              <input 
+                type="password" 
+                value={config.NANGO_SECRET_KEY || ''}
+                onChange={(e) => setConfig({...config, NANGO_SECRET_KEY: e.target.value})}
+                onBlur={(e) => saveConfig('NANGO_SECRET_KEY', e.target.value)}
+                placeholder="nango_sk_..."
+                className="w-full bg-muted border border-border px-5 py-3 text-sm text-foreground focus:outline-none focus:border-foreground/20 transition-all placeholder:text-muted-foreground/30 font-mono"
+              />
             </div>
 
-            <div className="p-6 bg-slate-50/50 border border-slate-100 rounded-2xl flex items-center justify-between hover:bg-white hover:shadow-sm transition-all group">
-              <div className="flex items-center gap-5">
-                <div className="w-12 h-12 bg-white border border-slate-200 flex items-center justify-center text-sm font-black text-slate-400 rounded-xl shadow-sm">S</div>
-                <div>
-                  <p className="text-base font-bold text-slate-900 tracking-tight">Slack_INTEL</p>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">STREAM_READY</p>
+            <div className="space-y-3">
+              <div className="p-5 bg-muted border border-border flex items-center justify-between hover:border-foreground/20 transition-all group">
+                <div className="flex items-center gap-4">
+                  <div className="w-8 h-8 bg-white border border-border flex items-center justify-center text-[10px] font-bold text-muted-foreground">G</div>
+                  <div>
+                    <p className="text-sm font-bold text-foreground tracking-tight">GMAIL_INTEL</p>
+                    <p className="text-[9px] font-medium text-muted-foreground uppercase tracking-widest">SYNC_READY</p>
+                  </div>
                 </div>
+                <Button size="sm" variant="outline" onClick={() => connectService('google-gmail')}>Link</Button>
               </div>
-              <Button size="sm" variant="outline" onClick={() => connectService('slack')} className="font-bold border-slate-200">Link</Button>
+
+              <div className="p-5 bg-muted border border-border flex items-center justify-between hover:border-foreground/20 transition-all group">
+                <div className="flex items-center gap-4">
+                  <div className="w-8 h-8 bg-white border border-border flex items-center justify-center text-[10px] font-bold text-muted-foreground">S</div>
+                  <div>
+                    <p className="text-sm font-bold text-foreground tracking-tight">SLACK_INTEL</p>
+                    <p className="text-[9px] font-medium text-muted-foreground uppercase tracking-widest">STREAM_READY</p>
+                  </div>
+                </div>
+                <Button size="sm" variant="outline" onClick={() => connectService('slack')}>Link</Button>
+              </div>
             </div>
           </div>
 
-          <div className="p-6 bg-blue-50 border border-blue-100 rounded-2xl">
-            <p className="text-[11px] text-blue-700 leading-relaxed font-medium">
-              Note: Auth managed via <span className="font-bold underline">Nango Secure Vault</span>. Project Compass does not store raw API credentials.
+          <div className="p-5 bg-muted/50 border border-border">
+            <p className="text-[10px] text-muted-foreground leading-relaxed font-medium italic">
+              Note: Using <span className="font-bold">Connect Sessions</span>. Authorization is handled via secure temporary tokens.
             </p>
           </div>
         </Card>
@@ -224,30 +255,28 @@ export default function SettingsPage() {
         <Card className="lg:col-span-2 space-y-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-purple-50 text-purple-600 rounded-xl">
-                <Shield size={24} />
+              <div className="p-3 bg-muted text-foreground">
+                <Shield size={20} />
               </div>
-              <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight">Founder_Playbook</h3>
+              <h3 className="text-xl font-bold text-foreground tracking-tight">FOUNDER_PLAYBOOK</h3>
             </div>
             <Button 
               onClick={savePlaybook} 
               variant="primary" 
-              className="px-10 py-4 shadow-lg shadow-blue-500/20"
+              className="px-8"
               disabled={saving}
             >
-              <Save size={18} />
-              Commit Logic
+              <Save size={16} className="mr-2" />
+              COMMIT_LOGIC
             </Button>
           </div>
 
-          <div className="relative">
-            <textarea 
-              value={playbook}
-              onChange={(e) => setPlaybook(e.target.value)}
-              className="w-full h-80 bg-slate-50 border border-slate-200 rounded-2xl p-10 text-xl text-slate-800 leading-relaxed font-sans focus:outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-50 transition-all placeholder:text-slate-300"
-              placeholder="# Enter strategic principles here..."
-            />
-          </div>
+          <textarea 
+            value={playbook}
+            onChange={(e) => setPlaybook(e.target.value)}
+            className="w-full h-80 bg-muted border border-border p-10 text-lg text-foreground/80 leading-relaxed font-sans focus:outline-none focus:border-foreground/20 transition-all placeholder:text-muted-foreground/30"
+            placeholder="# Enter strategic principles here..."
+          />
         </Card>
 
       </div>

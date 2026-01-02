@@ -1,8 +1,9 @@
-from fastapi import FastAPI, BackgroundTasks, Request
+from fastapi import FastAPI, BackgroundTasks, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, Dict, Any
 import uvicorn
+import httpx
 from app.services.deepseek import DeepSeekService
 from app.services.ingestion import process_ingestion
 from app.models import get_db_engine, IngestionAuditLog, init_db, SessionLocal, SystemConfig, Playbook
@@ -90,6 +91,44 @@ async def update_playbook(data: PlaybookUpdate):
     db.commit()
     db.close()
     return {"status": "saved"}
+
+@app.post("/nango/session")
+async def create_nango_session():
+    """
+    Creates a Nango Connect Session token.
+    Checks SystemConfig for NANGO_SECRET_KEY first.
+    """
+    db = SessionLocal()
+    nango_secret_entry = db.query(SystemConfig).filter(SystemConfig.key == "NANGO_SECRET_KEY").first()
+    db.close()
+
+    nango_secret = nango_secret_entry.value if nango_secret_entry else os.getenv("NANGO_SECRET_KEY")
+
+    if not nango_secret:
+        return {"error": "NANGO_SECRET_KEY not configured in DB or environment.", "status_code": 500}
+    
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.post(
+                "https://api.nango.dev/connect/sessions",
+                headers={
+                    "Authorization": f"Bearer {nango_secret}",
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "end_user": {
+                        "id": "stefan-primary",
+                        "email": "stefan@example.com",
+                        "display_name": "Stefan"
+                    }
+                }
+            )
+            response.raise_for_status()
+            return response.json()
+        except httpx.HTTPStatusError as e:
+            return {"error": f"Nango API error: {e.response.text}", "status_code": e.response.status_code}
+        except Exception as e:
+            return {"error": str(e)}
 
 @app.post("/ingest/webhook")
 async def nango_webhook(request: Request, background_tasks: BackgroundTasks):

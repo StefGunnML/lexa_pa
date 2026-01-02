@@ -2,7 +2,7 @@ import React from 'react';
 
 export function Card({ children, className = "" }: { children: React.ReactNode, className?: string }) {
   return (
-    <div className={`luxury-card p-10 hover:shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] ${className}`}>
+    <div className={`luxury-card p-10 hover:border-black/20 ${className}`}>
       {children}
     </div>
   );
@@ -24,16 +24,16 @@ export function Button({
   className?: string
 }) {
   const styles = {
-    primary: "bg-[#1a73e8] text-white hover:bg-[#1557b0] shadow-sm hover:shadow-md",
-    secondary: "bg-slate-900 text-white hover:bg-black",
+    primary: "bg-black text-white hover:bg-black/90",
+    secondary: "bg-slate-100 text-slate-900 hover:bg-slate-200",
     destructive: "bg-white text-red-600 border border-red-200 hover:bg-red-50",
-    outline: "border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+    outline: "border border-border text-muted-foreground hover:bg-muted hover:text-foreground"
   };
 
   const sizes = {
-    default: "px-6 py-3 text-xs uppercase tracking-widest font-bold rounded-lg",
-    sm: "px-4 py-1.5 text-[10px] uppercase tracking-widest font-bold rounded-md",
-    lg: "px-10 py-4 text-sm uppercase tracking-widest font-black rounded-xl"
+    default: "px-5 py-2.5 text-[11px] uppercase tracking-[0.15em] font-semibold",
+    sm: "px-3 py-1.5 text-[10px] uppercase tracking-[0.1em] font-semibold",
+    lg: "px-8 py-3.5 text-xs uppercase tracking-[0.2em] font-bold"
   };
   
   return (
@@ -49,13 +49,13 @@ export function Button({
 
 export function Badge({ children, variant = "default", className = "" }: { children: React.ReactNode, variant?: "default" | "warning" | "success", className?: string }) {
   const styles = {
-    default: "bg-slate-100 text-slate-500",
-    warning: "bg-amber-100 text-amber-700",
-    success: "bg-emerald-100 text-emerald-700"
+    default: "bg-muted text-muted-foreground border border-border",
+    warning: "bg-amber-50 text-amber-700 border border-amber-100",
+    success: "bg-emerald-50 text-emerald-700 border border-emerald-100"
   };
   
   return (
-    <span className={`px-2.5 py-1 font-mono text-[9px] font-black tracking-[0.15em] uppercase rounded ${styles[variant]} ${className}`}>
+    <span className={`px-2 py-0.5 font-mono text-[9px] font-medium tracking-[0.1em] uppercase ${styles[variant]} ${className}`}>
       {children}
     </span>
   );

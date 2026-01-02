@@ -38,60 +38,60 @@ export default function MeetingsSession() {
   }, []);
 
   return (
-    <div className="space-y-16 font-sans">
+    <div className="space-y-16 pb-20 font-sans">
       <header className="space-y-6">
         <div className="flex items-center gap-3">
-          <span className="system-label">SESSION_LOG_BROWSER</span>
+          <span className="system-label">LOG: ARCHIVED</span>
           <span className="system-label">TRANSCRIPTION: WHISPER-V3</span>
         </div>
-        <h2 className="text-6xl font-extrabold tracking-tight text-slate-900">Session</h2>
-        <p className="text-slate-500 text-xl max-w-2xl font-medium leading-relaxed">
-          Historical positioning intelligence... <span className="text-blue-600 font-bold">strategic_pivots</span> extracted and indexed for executive review.
+        <h2 className="text-5xl font-bold tracking-tighter text-foreground">Session</h2>
+        <p className="text-muted-foreground text-xl max-w-2xl font-medium leading-relaxed">
+          Historical positioning intelligence and <span className="text-foreground font-bold underline decoration-border decoration-2 underline-offset-4">strategic pivots</span> extracted for executive review.
         </p>
       </header>
 
       {loading ? (
         <div className="flex flex-col items-center justify-center p-32 gap-6">
-          <div className="w-10 h-10 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-          <p className="font-mono text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Decoding_Session_Logs</p>
+          <div className="w-8 h-8 border border-border border-t-foreground animate-spin"></div>
+          <p className="font-mono text-[9px] font-medium text-muted-foreground uppercase tracking-[0.2em]">DECODING_SESSION_LOGS</p>
         </div>
       ) : (
-        <div className="space-y-8">
+        <div className="space-y-6">
           {meetings.map(meeting => (
-            <Card key={meeting.id} className="p-10">
-              <div className="flex flex-col md:flex-row justify-between gap-16">
+            <Card key={meeting.id} className="p-8">
+              <div className="flex flex-col md:flex-row justify-between gap-12">
                 <div className="flex-1 space-y-10">
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     <div className="flex items-center gap-4">
-                      <Badge variant="success" className="font-bold">SESSION_READY</Badge>
-                      <span className="font-mono text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                      <Badge variant="success">LOGGED</Badge>
+                      <span className="font-mono text-[9px] font-medium text-muted-foreground uppercase tracking-widest">
                         {new Date(meeting.start_time).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase()}
                       </span>
                     </div>
-                    <h3 className="text-3xl font-extrabold text-slate-900 tracking-tight">{meeting.title}</h3>
+                    <h3 className="text-3xl font-bold text-foreground tracking-tighter">{meeting.title}</h3>
                   </div>
 
-                  <div className="space-y-4">
-                    <div className="font-mono text-[9px] font-black text-slate-400 uppercase tracking-widest">
-                      [STRATEGIC_POSITIONING]
+                  <div className="space-y-2">
+                    <div className="font-mono text-[9px] font-medium text-muted-foreground uppercase tracking-widest">
+                      STRATEGIC_POSITIONING
                     </div>
-                    <div className="p-8 bg-slate-50 border border-slate-100 rounded-xl">
-                      <p className="text-base text-slate-700 leading-relaxed font-medium italic">
+                    <div className="p-6 bg-muted border border-border">
+                      <p className="text-sm text-foreground/70 leading-relaxed font-sans italic">
                         "{meeting.positioning_notes}"
                       </p>
                     </div>
                   </div>
                 </div>
 
-                <div className="w-full md:w-72 space-y-6">
-                  <div className="font-mono text-[9px] font-black text-slate-400 uppercase tracking-widest">
-                    [COMMITMENTS_LOG]
+                <div className="w-full md:w-72 space-y-4">
+                  <div className="font-mono text-[9px] font-medium text-muted-foreground uppercase tracking-widest">
+                    COMMITMENTS
                   </div>
-                  <ul className="space-y-4">
+                  <ul className="space-y-2">
                     {meeting.action_items.map((item, i) => (
-                      <li key={i} className="flex items-start gap-4">
-                        <div className="mt-1.5 w-1.5 h-1.5 bg-blue-500/20 shrink-0 rounded-full"></div>
-                        <span className="text-sm font-bold text-slate-500 leading-snug uppercase tracking-tight">{item}</span>
+                      <li key={i} className="flex items-start gap-3">
+                        <div className="mt-1.5 w-1 h-1 bg-border shrink-0"></div>
+                        <span className="text-[11px] font-medium text-foreground/60 leading-snug uppercase tracking-wider">{item}</span>
                       </li>
                     ))}
                   </ul>

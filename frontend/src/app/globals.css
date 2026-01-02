@@ -3,55 +3,52 @@
 @tailwind utilities;
 
 :root {
-  --background: 0 0% 99%; /* Clean Paper #fcfcfc */
-  --foreground: 222 47% 11%; /* Deep Navy Charcoal */
+  --background: 0 0% 100%; /* Pure White */
+  --foreground: 0 0% 9%; /* Precision Near Black */
   --card: 0 0% 100%;
-  --card-foreground: 222 47% 11%;
-  --border: 222 47% 15%; /* Technical sharp border */
-  --primary: 221 83% 53%; /* Google-Refined Cobalt Blue #1a73e8 */
+  --card-foreground: 0 0% 9%;
+  --border: 0 0% 94%; /* Razor-thin gray border */
+  --primary: 0 0% 9%; /* Monochrome Primary */
   --primary-foreground: 0 0% 100%;
-  --accent: 221 83% 95%;
-  --accent-foreground: 221 83% 53%;
-  --muted: 210 40% 96.1%;
-  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 0 0% 96%;
+  --accent-foreground: 0 0% 9%;
+  --muted: 0 0% 98%;
+  --muted-foreground: 0 0% 50%;
 }
 
 @layer base {
   body {
-    @apply bg-[#fcfcfc] text-[#0f172a] antialiased selection:bg-blue-100;
-    /* Ultra-subtle system grid (Google refined) */
-    background-image: 
-      radial-gradient(rgba(0,0,0,0.05) 0.5px, transparent 0.5px),
-      linear-gradient(rgba(0,0,0,0.01) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,0,0,0.01) 1px, transparent 1px);
-    background-size: 20px 20px, 40px 40px, 40px 40px;
+    @apply bg-background text-foreground antialiased selection:bg-black/5;
+    /* Subtle dot-matrix grid (reduced noise) */
+    background-image: radial-gradient(circle at 1px 1px, rgba(0,0,0,0.01) 1px, transparent 0);
+    background-size: 24px 24px;
   }
 }
 
 .luxury-card {
-  @apply bg-white border border-black/10 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] transition-all duration-300;
+  @apply bg-white border border-border shadow-none transition-all duration-300;
 }
 
 .mercury-border {
-  @apply border border-black/10;
+  @apply border border-border;
 }
 
 .text-mercury-muted {
-  @apply font-mono text-[10px] uppercase tracking-[0.15em] text-slate-400 font-bold;
+  @apply font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground font-medium;
 }
 
 .italic-mercury {
-  @apply font-sans text-slate-600 leading-relaxed;
-  font-size: 1.05rem;
+  @apply font-sans text-foreground/80 leading-relaxed;
+  font-size: 0.95rem;
 }
 
 .high-focus-title {
-  @apply text-slate-900 font-sans font-extrabold tracking-tight;
+  @apply text-foreground font-sans font-bold tracking-tighter;
 }
 
-/* System Label (Google Refined Retro) */
+/* Platform System Label */
 .system-label {
-  @apply font-mono text-[9px] font-black uppercase tracking-[0.2em] bg-slate-100 px-2 py-0.5 rounded-sm text-slate-500;
+  @apply font-mono text-[9px] font-medium uppercase tracking-[0.2em] bg-muted border border-border px-2 py-0.5 text-muted-foreground;
 }
 
 @keyframes cursor-blink {
