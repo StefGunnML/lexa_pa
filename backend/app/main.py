@@ -245,6 +245,9 @@ async def debug_nango_connections():
 @app.get("/auth/gmail/start")
 async def start_gmail_oauth():
     """Initiate Gmail OAuth flow"""
+    # #region agent log
+    logger.info("[Compass] /auth/gmail/start called")
+    # #endregion
     db = SessionLocal()
     gmail_service = GmailDirectService(db)
     auth_url = gmail_service.get_authorization_url()
@@ -255,12 +258,16 @@ async def start_gmail_oauth():
 @app.get("/auth/gmail/callback")
 async def gmail_oauth_callback(code: str, state: str = "default"):
     """Handle Gmail OAuth callback"""
+    # #region agent log
+    logger.info(f"[Compass] /auth/gmail/callback called with code: {code[:10]}...")
+    # #endregion
     db = SessionLocal()
     gmail_service = GmailDirectService(db)
     
     try:
         # Exchange code for token
         token_data = await gmail_service.exchange_code_for_token(code)
+        logger.info("[Compass] Token exchange successful")
         
         # Get user email
         user_email = "default@compass.com"
@@ -272,33 +279,47 @@ async def gmail_oauth_callback(code: str, state: str = "default"):
             if user_info_response.status_code == 200:
                 user_info = user_info_response.json()
                 user_email = user_info.get("email", user_email)
+                logger.info(f"[Compass] User email retrieved: {user_email}")
         
         # Save token
         gmail_service.save_token(token_data, user_email)
         
         # Redirect to frontend settings page with success
-        frontend_url = os.getenv("FRONTEND_URL", "https://lexa-pa-2rwqf.ondigitalocean.app")
+        frontend_url = os.getenv("FRONTEND_URL", "https://project-compass-os-hdke9.ondigitalocean.app")
         db.close()
+        logger.info(f"[Compass] Gmail connected. Redirecting to: {frontend_url}/dashboard/settings?gmail=connected")
         return RedirectResponse(url=f"{frontend_url}/dashboard/settings?gmail=connected")
         
     except Exception as e:
-        logger.error(f"[Compass] Gmail OAuth callback error: {e}")
+        logger.error(f"[Compass] Gmail OAuth callback error: {str(e)}")
+        # #region agent log
+        logger.error(f"[Compass] EXCEPTION in callback: {type(e).__name__}: {str(e)}")
+        # #endregion
         db.close()
-        frontend_url = os.getenv("FRONTEND_URL", "https://lexa-pa-2rwqf.ondigitalocean.app")
+        frontend_url = os.getenv("FRONTEND_URL", "https://project-compass-os-hdke9.ondigitalocean.app")
         return RedirectResponse(url=f"{frontend_url}/dashboard/settings?gmail=error")
 
 @app.post("/gmail/sync")
 async def sync_gmail():
     """Manually sync Gmail messages"""
+    # #region agent log
+    logger.info("[Compass] /gmail/sync called")
+    # #endregion
     db = SessionLocal()
     gmail_service = GmailDirectService(db)
     
     try:
         result = await gmail_service.sync_messages()
+        # #region agent log
+        logger.info(f"[Compass] Sync result: {result}")
+        # #endregion
         db.close()
         return result
     except Exception as e:
-        logger.error(f"[Compass] Gmail sync error: {e}")
+        logger.error(f"[Compass] Gmail sync error: {str(e)}")
+        # #region agent log
+        logger.error(f"[Compass] SYNC EXCEPTION: {str(e)}")
+        # #endregion
         db.close()
         raise HTTPException(status_code=500, detail=str(e))
 
