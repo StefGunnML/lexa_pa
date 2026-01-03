@@ -68,6 +68,28 @@ async def update_config(data: ConfigUpdate):
     db.close()
     return {"status": "updated"}
 
+@app.get("/playbook")
+async def get_playbook():
+    db = SessionLocal()
+    playbook = db.query(Playbook).filter(Playbook.is_active == True).first()
+    db.close()
+    if playbook:
+        return {"content": playbook.content}
+    return {"content": "# Strategic Playbook\n\nDefine your strategic principles here..."}
+
+@app.post("/playbook")
+async def update_playbook(data: PlaybookUpdate):
+    db = SessionLocal()
+    playbook = db.query(Playbook).filter(Playbook.is_active == True).first()
+    if not playbook:
+        playbook = Playbook(content=data.content)
+        db.add(playbook)
+    else:
+        playbook.content = data.content
+    db.commit()
+    db.close()
+    return {"status": "updated"}
+
 @app.get("/actions")
 async def list_pending_actions():
     db = SessionLocal()
