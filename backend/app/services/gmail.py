@@ -5,6 +5,7 @@ from app.services.deepseek import DeepSeekService
 from app.services.agent import CompassAgent
 from app.models import Thread, Message
 from datetime import datetime
+import uuid
 
 class GmailService:
     def __init__(self, db_session):

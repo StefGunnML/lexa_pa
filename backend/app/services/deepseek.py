@@ -1,19 +1,25 @@
 import os
+import json
 from openai import OpenAI
 from typing import Dict, Any
 from app.models import SessionLocal, SystemConfig
 
 class DeepSeekService:
     def __init__(self):
-        db = SessionLocal()
-        api_key = db.query(SystemConfig).filter(SystemConfig.key == "DEEPSEEK_API_KEY").first()
-        base_url = db.query(SystemConfig).filter(SystemConfig.key == "DEEPSEEK_API_BASE").first()
-        model = db.query(SystemConfig).filter(SystemConfig.key == "DEEPSEEK_MODEL").first()
-        db.close()
+        try:
+            db = SessionLocal()
+            api_key = db.query(SystemConfig).filter(SystemConfig.key == "DEEPSEEK_API_KEY").first()
+            base_url = db.query(SystemConfig).filter(SystemConfig.key == "DEEPSEEK_API_BASE").first()
+            model = db.query(SystemConfig).filter(SystemConfig.key == "DEEPSEEK_MODEL").first()
+            db.close()
 
-        self.api_key = api_key.value if api_key else os.getenv("DEEPSEEK_API_KEY")
-        self.base_url = base_url.value if base_url else os.getenv("DEEPSEEK_API_BASE")
-        self.model = model.value if model else os.getenv("DEEPSEEK_MODEL", "LEXA")
+            self.api_key = api_key.value if api_key else os.getenv("DEEPSEEK_API_KEY")
+            self.base_url = base_url.value if base_url else os.getenv("DEEPSEEK_API_BASE")
+            self.model = model.value if model else os.getenv("DEEPSEEK_MODEL", "LEXA")
+        except Exception:
+            self.api_key = os.getenv("DEEPSEEK_API_KEY")
+            self.base_url = os.getenv("DEEPSEEK_API_BASE")
+            self.model = os.getenv("DEEPSEEK_MODEL", "LEXA")
 
         self.client = OpenAI(
             api_key=self.api_key,
@@ -73,7 +79,6 @@ class DeepSeekService:
         }}
         """
         
-        import json
         response = self.client.chat.completions.create(
             model=self.model,
             messages=[

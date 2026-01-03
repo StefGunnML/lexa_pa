@@ -19,10 +19,16 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Initialize Database
-init_db()
-
 app = FastAPI(title="Project Compass API")
+
+@app.on_event("startup")
+async def startup_event():
+    logger.info("[Compass] Backend starting up...")
+    try:
+        init_db()
+        logger.info("[Compass] Database initialized.")
+    except Exception as e:
+        logger.error(f"[Compass] Database initialization failed: {e}")
 
 # Pydantic models for API
 class ConfigUpdate(BaseModel):
@@ -341,4 +347,4 @@ async def gmail_connection_status():
         return {"status": "error", "has_token": False, "error": str(e)}
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=False)
