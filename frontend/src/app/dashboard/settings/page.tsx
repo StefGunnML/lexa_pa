@@ -129,7 +129,7 @@ export default function SettingsPage() {
         <div className="flex items-center gap-3">
           <span className="system-label">CALIBRATION: NODE_01</span>
           <span className="system-label">ENCRYPTION: AES-256</span>
-          <span className="system-label bg-emerald-100 text-emerald-600 font-bold border-emerald-200 uppercase">DIRECT_OAUTH_V1</span>
+          <span className="system-label bg-emerald-100 text-emerald-600 font-bold border-emerald-200 uppercase animate-pulse">DEPLOY_FORCE_V2</span>
         </div>
         <h2 className="text-5xl font-bold tracking-tighter text-foreground">System Command</h2>
         <p className="text-muted-foreground text-xl max-w-2xl font-medium leading-relaxed">
