@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { Card, Button, Badge } from '@/components/ui/core';
 import { Shield, Zap, MessageSquare, Save, Play, RefreshCw, CheckCircle } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 
-export default function SettingsPage() {
+function SettingsContent() {
   const searchParams = useSearchParams();
   const [config, setConfig] = useState<any>({
     DEEPSEEK_API_BASE: '',
@@ -129,7 +129,7 @@ export default function SettingsPage() {
         <div className="flex items-center gap-3">
           <span className="system-label">CALIBRATION: NODE_01</span>
           <span className="system-label">ENCRYPTION: AES-256</span>
-          <span className="system-label bg-emerald-100 text-emerald-600 font-bold border-emerald-200 uppercase animate-pulse">DEPLOY_FORCE_V2</span>
+          <span className="system-label bg-emerald-100 text-emerald-600 font-bold border-emerald-200 uppercase animate-pulse">DEPLOY_FORCE_V3</span>
         </div>
         <h2 className="text-5xl font-bold tracking-tighter text-foreground">System Command</h2>
         <p className="text-muted-foreground text-xl max-w-2xl font-medium leading-relaxed">
@@ -280,6 +280,14 @@ export default function SettingsPage() {
 
       </div>
     </div>
+  );
+}
+
+export default function SettingsPage() {
+  return (
+    <Suspense fallback={<div>Loading Settings...</div>}>
+      <SettingsContent />
+    </Suspense>
   );
 }
 
