@@ -2,24 +2,37 @@
 
 import React, { useState, useEffect } from 'react';
 import { Card, Button, Badge } from '@/components/ui/core';
-import { Shield, Zap, MessageSquare, Save, Play, RefreshCw } from 'lucide-react';
-import Nango from '@nangohq/frontend';
+import { Shield, Zap, MessageSquare, Save, Play, RefreshCw, CheckCircle } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
 
 export default function SettingsPage() {
+  const searchParams = useSearchParams();
   const [config, setConfig] = useState<any>({
     DEEPSEEK_API_BASE: '',
     DEEPSEEK_API_KEY: '',
-    NANGO_SECRET_KEY: '',
+    GOOGLE_CLIENT_ID: '',
+    GOOGLE_CLIENT_SECRET: '',
   });
 
   const [playbook, setPlaybook] = useState('');
   const [pulseStatus, setPulseStatus] = useState<'idle' | 'testing' | 'active' | 'error'>('idle');
   const [saving, setSaving] = useState(false);
+  const [gmailStatus, setGmailStatus] = useState<'disconnected' | 'connected' | 'checking'>('checking');
 
   useEffect(() => {
     fetchConfig();
     fetchPlaybook();
-  }, []);
+    checkGmailStatus();
+    
+    // Check for OAuth callback success
+    const gmailParam = searchParams.get('gmail');
+    if (gmailParam === 'connected') {
+      alert('✅ Gmail connected successfully! Your emails will start syncing now.');
+      checkGmailStatus();
+    } else if (gmailParam === 'error') {
+      alert('❌ Gmail connection failed. Please try again.');
+    }
+  }, [searchParams]);
 
   const fetchConfig = async () => {
     try {
@@ -83,48 +96,30 @@ export default function SettingsPage() {
     }
   };
 
-  const connectService = async (provider: string) => {
+  const checkGmailStatus = async () => {
+    setGmailStatus('checking');
     try {
-      const requestBody = JSON.stringify({ provider });
-      const sessionRes = await fetch('/api/nango/session', { 
-        method: 'POST',
-        headers: { 
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: requestBody
-      });
-      
-      const sessionData = await sessionRes.json();
+      const res = await fetch('/api/gmail/status');
+      const data = await res.json();
+      setGmailStatus(data.status === 'connected' ? 'connected' : 'disconnected');
+    } catch (err) {
+      console.error("Failed to check Gmail status", err);
+      setGmailStatus('disconnected');
+    }
+  };
 
-      if (sessionData.error) {
-        console.error(`[Compass] Session Error:`, sessionData);
-        const errorMsg = sessionData.detail?.error?.message || "";
-        
-        if (errorMsg.includes("Integration does not exist")) {
-          alert(`Almost there! You need to add the "${provider}" integration in your Nango Dashboard.\n\n1. Go to Nango > Integrations\n2. Search for ${provider.includes('gmail') ? 'Gmail' : 'Slack'}\n3. Click "Add Integration"\n4. IMPORTANT: In the "Unique Key" field, type exactly: ${provider}`);
-        } else {
-          alert(`Integration Error: ${sessionData.error}\n${errorMsg || "Make sure your Nango Secret Key is correct."}`);
-        }
-        return;
-      }
+  const connectGmail = () => {
+    // Redirect to backend OAuth flow
+    window.location.href = '/api/auth/gmail/start';
+  };
 
-      const sessionToken = sessionData.token || sessionData.sessionToken;
-      if (!sessionToken) return;
-
-      const nango = new Nango();
-      const connect = nango.openConnectUI({
-        onEvent: (event: any) => {
-          if (event.type === 'connect') {
-            alert(`Successfully connected to ${provider}!`);
-          }
-        },
-      });
-
-      connect.setSessionToken(sessionToken);
-      
+  const syncGmail = async () => {
+    try {
+      const res = await fetch('/api/gmail/sync', { method: 'POST' });
+      const data = await res.json();
+      alert(`✅ Synced ${data.processed} new emails!`);
     } catch (err: any) {
-      console.error(`[Compass] Frontend Crash:`, err);
+      alert(`❌ Sync failed: ${err.message}`);
     }
   };
 
@@ -134,7 +129,7 @@ export default function SettingsPage() {
         <div className="flex items-center gap-3">
           <span className="system-label">CALIBRATION: NODE_01</span>
           <span className="system-label">ENCRYPTION: AES-256</span>
-          <span className="system-label bg-green-100 text-green-600 font-bold border-green-200 uppercase">BUILD: SESSION_SUCCESS_V1</span>
+          <span className="system-label bg-emerald-100 text-emerald-600 font-bold border-emerald-200 uppercase">DIRECT_OAUTH_V1</span>
         </div>
         <h2 className="text-5xl font-bold tracking-tighter text-foreground">System Command</h2>
         <p className="text-muted-foreground text-xl max-w-2xl font-medium leading-relaxed">
@@ -200,59 +195,59 @@ export default function SettingsPage() {
 
         {/* Step 2: Communication Nodes */}
         <Card className="space-y-10">
-          <form className="space-y-10" onSubmit={(e) => e.preventDefault()}>
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-muted text-foreground">
-                <MessageSquare size={20} />
-              </div>
-              <h3 className="text-xl font-bold text-foreground tracking-tight">COMM_NODES</h3>
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-muted text-foreground">
+              <MessageSquare size={20} />
             </div>
+            <h3 className="text-xl font-bold text-foreground tracking-tight">COMM_NODES</h3>
+          </div>
 
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <label className="text-[9px] font-medium text-muted-foreground uppercase tracking-[0.2em]">NANGO_SECRET_KEY</label>
-                <input 
-                  type="password" 
-                  value={config.NANGO_SECRET_KEY || ''}
-                  onChange={(e) => setConfig({...config, NANGO_SECRET_KEY: e.target.value})}
-                  onBlur={(e) => saveConfig('NANGO_SECRET_KEY', e.target.value)}
-                  placeholder="nango_sk_..."
-                  autoComplete="current-password"
-                  className="w-full bg-muted border border-border px-5 py-3 text-sm text-foreground focus:outline-none focus:border-foreground/20 transition-all placeholder:text-muted-foreground/30 font-mono"
-                />
-              </div>
-
-              <div className="space-y-3">
-                <div className="p-5 bg-muted border border-border flex items-center justify-between hover:border-foreground/20 transition-all group">
-                  <div className="flex items-center gap-4">
-                    <div className="w-8 h-8 bg-white border border-border flex items-center justify-center text-[10px] font-bold text-muted-foreground">G</div>
-                    <div>
-                      <p className="text-sm font-bold text-foreground tracking-tight">GMAIL_INTEL</p>
-                      <p className="text-[9px] font-medium text-muted-foreground uppercase tracking-widest">SYNC_READY</p>
-                    </div>
+          <div className="space-y-6">
+            <div className="space-y-3">
+              <div className="p-5 bg-muted border border-border flex items-center justify-between hover:border-foreground/20 transition-all group">
+                <div className="flex items-center gap-4">
+                  <div className="w-8 h-8 bg-white border border-border flex items-center justify-center text-[10px] font-bold text-muted-foreground">G</div>
+                  <div>
+                    <p className="text-sm font-bold text-foreground tracking-tight">GMAIL_INTEL</p>
+                    <p className="text-[9px] font-medium text-muted-foreground uppercase tracking-widest">
+                      {gmailStatus === 'checking' && 'CHECKING...'}
+                      {gmailStatus === 'connected' && 'ACTIVE'}
+                      {gmailStatus === 'disconnected' && 'READY_TO_LINK'}
+                    </p>
                   </div>
-                      <Button size="sm" variant="outline" onClick={() => connectService('google-mail')}>Link</Button>
                 </div>
-
-                <div className="p-5 bg-muted border border-border flex items-center justify-between hover:border-foreground/20 transition-all group">
-                  <div className="flex items-center gap-4">
-                    <div className="w-8 h-8 bg-white border border-border flex items-center justify-center text-[10px] font-bold text-muted-foreground">S</div>
-                    <div>
-                      <p className="text-sm font-bold text-foreground tracking-tight">SLACK_INTEL</p>
-                      <p className="text-[9px] font-medium text-muted-foreground uppercase tracking-widest">STREAM_READY</p>
-                    </div>
-                  </div>
-                  <Button size="sm" variant="outline" onClick={() => connectService('slack')}>Link</Button>
+                <div className="flex gap-2">
+                  {gmailStatus === 'connected' ? (
+                    <>
+                      <CheckCircle size={18} className="text-emerald-600" />
+                      <Button size="sm" variant="outline" onClick={syncGmail}>Sync Now</Button>
+                    </>
+                  ) : (
+                    <Button size="sm" variant="primary" onClick={connectGmail}>
+                      Connect Gmail
+                    </Button>
+                  )}
                 </div>
               </div>
-            </div>
 
-            <div className="p-5 bg-muted/50 border border-border">
-              <p className="text-[10px] text-muted-foreground leading-relaxed font-medium italic">
-                Note: Using <span className="font-bold">Connect Sessions</span>. Authorization is handled via secure temporary tokens.
-              </p>
+              <div className="p-5 bg-muted border border-border flex items-center justify-between hover:border-foreground/20 transition-all group opacity-50">
+                <div className="flex items-center gap-4">
+                  <div className="w-8 h-8 bg-white border border-border flex items-center justify-center text-[10px] font-bold text-muted-foreground">S</div>
+                  <div>
+                    <p className="text-sm font-bold text-foreground tracking-tight">SLACK_INTEL</p>
+                    <p className="text-[9px] font-medium text-muted-foreground uppercase tracking-widest">COMING_SOON</p>
+                  </div>
+                </div>
+                <Button size="sm" variant="outline" disabled>Coming Soon</Button>
+              </div>
             </div>
-          </form>
+          </div>
+
+          <div className="p-5 bg-emerald-50 border border-emerald-200">
+            <p className="text-[10px] text-emerald-700 leading-relaxed font-medium">
+              ✓ Direct Google OAuth — No third-party dependencies. Your data flows directly from Google to your database.
+            </p>
+          </div>
         </Card>
 
         {/* Step 3: Strategic Playbook */}

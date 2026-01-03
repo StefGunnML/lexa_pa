@@ -39,10 +39,15 @@ export default function StagingArea() {
   const triggerManualSync = async () => {
     setSyncing(true);
     try {
-      await fetch('/api/nango/manual-sync', { method: 'POST' });
+      const res = await fetch('/api/gmail/sync', { method: 'POST' });
+      if (res.ok) {
+        const data = await res.json();
+        alert(`✅ Synced ${data.processed} new emails!`);
+      }
       await fetchActions();
     } catch (err) {
-      console.error("Manual sync failed", err);
+      console.error("Gmail sync failed", err);
+      alert("Gmail sync failed. Make sure Gmail is connected in Settings.");
     } finally {
       setSyncing(false);
     }
@@ -98,7 +103,7 @@ export default function StagingArea() {
               <p className="text-muted-foreground text-xs uppercase tracking-[0.2em] font-medium">SYSTEM_IDLE</p>
               {!syncing && (
                 <Button variant="primary" size="sm" onClick={triggerManualSync}>
-                  INITIALIZE_FIRST_FETCH
+                  SYNC_GMAIL_NOW
                 </Button>
               )}
             </div>

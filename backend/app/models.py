@@ -89,6 +89,19 @@ class Playbook(Base):
     created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
     updated_at = Column(DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow)
 
+class OAuthToken(Base):
+    __tablename__ = 'oauth_tokens'
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    provider = Column(String, nullable=False)  # 'gmail', 'slack', etc.
+    user_id = Column(String, default='default_user')  # For future multi-user support
+    access_token = Column(Text, nullable=False)
+    refresh_token = Column(Text)
+    token_expiry = Column(DateTime(timezone=True))
+    scopes = Column(JSONB, default=[])
+    metadata = Column(JSONB, default={})  # Store email, name, etc.
+    created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
+    updated_at = Column(DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow)
+
 # Note: pgvector specific columns and indexes are best handled via raw SQL or specialized extensions
 # like pgvector-python. For this scaffold, we'll stick to basic SQLAlchemy.
 
